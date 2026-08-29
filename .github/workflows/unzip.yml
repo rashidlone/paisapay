@@ -1,29 +1,93 @@
-name: Unzip public_html
+
+### GitHub Actions workflow
+
+Create:
+
+`.github/workflows/generate-code-md.yml`
+
+```yaml
+name: Generate Code Markdown
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
 
 jobs:
-  unzip:
+  generate:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Unzip public_html.zip
+      - name: Generate CODE.md
+        shell: bash
         run: |
-          rm -rf public_html
-          mkdir -p public_html
-          unzip -o public_html.zip -d public_html
+          set -e
 
-      - name: Commit extracted files
+          OUTPUT="CODE.md"
+
+          echo "# Repository Code" > "$OUTPUT"
+          echo "" >> "$OUTPUT"
+          echo "Generated automatically by GitHub Actions." >> "$OUTPUT"
+          echo "" >> "$OUTPUT"
+
+          find . -type f \
+            ! -path "./.git/*" \
+            ! -path "./.github/*" \
+            ! -path "./CODE.md" \
+            | sort | while read -r file; do
+
+              path="${file#./}"
+
+              echo "## \`$path\`" >> "$OUTPUT"
+              echo "" >> "$OUTPUT"
+
+              # Detect language from file extension
+              case "$file" in
+                *.php)      lang="php" ;;
+                *.html|*.htm) lang="html" ;;
+                *.css)      lang="css" ;;
+                *.js)       lang="javascript" ;;
+                *.ts)       lang="typescript" ;;
+                *.json)     lang="json" ;;
+                *.xml)      lang="xml" ;;
+                *.sql)      lang="sql" ;;
+                *.py)       lang="python" ;;
+                *.java)     lang="java" ;;
+                *.c)        lang="c" ;;
+                *.cpp|*.cc) lang="cpp" ;;
+                *.h|*.hpp)  lang="cpp" ;;
+                *.sh)       lang="bash" ;;
+                *.yml|*.yaml) lang="yaml" ;;
+                *.md)       lang="markdown" ;;
+                *.txt)      lang="text" ;;
+                *)          lang="" ;;
+              esac
+
+              echo '```'"$lang" >> "$OUTPUT"
+              cat "$file" >> "$OUTPUT"
+              echo "" >> "$OUTPUT"
+              echo '```' >> "$OUTPUT"
+              echo "" >> "$OUTPUT"
+
+          done
+
+      - name: Commit CODE.md
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public_html
-          git commit -m "Extract public_html.zip" || echo "No changes to commit"
-          git push
+
+          git add CODE.md
+
+          if git diff --cached --quiet; then
+            echo "No changes to CODE.md"
+          else
+            git commit -m "Update CODE.md"
+            git push
+          fi
