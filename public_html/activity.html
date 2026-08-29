@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Activity History - PaisaPay</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            padding-top: 56px !important;
+            padding-bottom: 70px !important;
+            background: #0a0e1a;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .activity-card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #1a2234;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+        .filter-tabs::-webkit-scrollbar {
+            height: 0;
+        }
+        .filter-tabs .btn-filter {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: transparent;
+            border: 1px solid #1a2234;
+            color: #64748b;
+            transition: all 0.3s;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .filter-tabs .btn-filter:hover {
+            border-color: #2a3a4a;
+            color: #94a3b8;
+        }
+        .filter-tabs .btn-filter.active {
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            border-color: transparent;
+            color: #ffffff;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #1a2234;
+            transition: background 0.2s;
+            gap: 12px;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .activity-item .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .activity-item .icon-wrapper.credit { background: rgba(52,211,153,0.15); color: #34d399; }
+        .activity-item .icon-wrapper.debit { background: rgba(248,113,113,0.15); color: #f87171; }
+        .activity-item .icon-wrapper.referral { background: rgba(167,139,250,0.15); color: #a78bfa; }
+        .activity-item .icon-wrapper.task { background: rgba(96,165,250,0.15); color: #60a5fa; }
+        .activity-item .icon-wrapper.withdrawal { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .activity-item .icon-wrapper.bonus { background: rgba(251,146,60,0.15); color: #fb923c; }
+        .activity-item .icon-wrapper.other { background: rgba(148,163,184,0.15); color: #94a3b8; }
+        .status-badge.paid { background: #10b981 !important; color: white !important; }
+        
+        .activity-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+        .activity-item .info .title {
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 14px;
+        }
+        .activity-item .info .desc {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .activity-item .info .time {
+            font-size: 11px;
+            color: #4a5a6a;
+        }
+        
+        .activity-item .amount {
+            font-weight: 700;
+            font-size: 15px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .activity-item .amount.positive { color: #34d399; }
+        .activity-item .amount.negative { color: #f87171; }
+        .activity-item .amount.neutral { color: #94a3b8; }
+        
+        .activity-item .status-badge {
+            font-size: 9px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .activity-item .status-badge.completed { background: rgba(52,211,153,0.15); color: #34d399; }
+        .activity-item .status-badge.pending { background: rgba(251,191,36,0.15); color: #fbbf24; }
+        .activity-item .status-badge.failed { background: rgba(248,113,113,0.15); color: #f87171; }
+        .activity-item .status-badge.cancelled { background: rgba(148,163,184,0.15); color: #94a3b8; }
+        .activity-item .status-badge.approved { background: rgba(52,211,153,0.15); color: #34d399; }
+        .activity-item .status-badge.rejected { background: rgba(248,113,113,0.15); color: #f87171; }
+        .activity-item .status-badge.under_review { background: rgba(96,165,250,0.15); color: #60a5fa; }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 16px;
+            background: #0d1524;
+            border-bottom: 1px solid #1a2234;
+        }
+        .stats-row .stat-item {
+            text-align: center;
+        }
+        .stats-row .stat-item .number {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .stats-row .stat-item .label {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .stats-row .stat-item .number.green { color: #34d399; }
+        .stats-row .stat-item .number.red { color: #f87171; }
+        .stats-row .stat-item .number.purple { color: #a78bfa; }
+        .stats-row .stat-item .number.yellow { color: #fbbf24; }
+        
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .empty-state i {
+            font-size: 40px;
+            color: #2a3a4a;
+            margin-bottom: 12px;
+        }
+        .empty-state h6 {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .empty-state p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .bottom-nav {
+            background: #111827 !important;
+            border-top: 1px solid #1e293b;
+            padding: 4px 0 env(safe-area-inset-bottom);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .bottom-nav .nav-link {
+            color: #64748b !important;
+            text-align: center;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 48px;
+            text-decoration: none;
+        }
+        .bottom-nav .nav-link i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 1px;
+        }
+        .bottom-nav .nav-link.active {
+            color: #8B5CF6 !important;
+        }
+        .bottom-nav .nav-link.active i {
+            color: #8B5CF6 !important;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .btn-back {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 8px 0;
+            transition: color 0.2s;
+        }
+        .btn-back:hover {
+            color: #ffffff;
+        }
+        
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .filter-tabs {
+                padding: 8px 12px;
+            }
+            .filter-tabs .btn-filter {
+                font-size: 11px;
+                padding: 4px 12px;
+            }
+            .activity-item {
+                padding: 12px 14px;
+            }
+            .activity-item .info .title {
+                font-size: 13px;
+            }
+            .activity-item .amount {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAV IFRAME -->
+    <iframe 
+        src="/includes/nav.html" 
+        style="width:100%; height:56px; border:none; position:fixed; top:0; left:0; z-index:1000; background:transparent !important; overflow:visible;"
+        scrolling="no"
+        id="navIframe"
+        allowtransparency="true">
+    </iframe>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            var iframe = document.getElementById('navIframe');
+            if (!iframe) return;
+            if (event.data && event.data.type === 'expandNav') {
+                iframe.style.height = '400px';
+                iframe.style.background = 'transparent';
+            } else if (event.data && event.data.type === 'collapseNav') {
+                iframe.style.height = '56px';
+                iframe.style.background = 'transparent';
+            }
+        });
+    </script>
+
+    <div class="container mt-3 mt-md-4 pb-5">
+        
+        <!-- Header -->
+        <div class="d-flex align-items-center gap-3 mb-4">
+            <button class="btn-back" onclick="history.back()">
+                <i class="fas fa-arrow-left fa-lg"></i>
+            </button>
+            <h5 class="text-white mb-0"><i class="fas fa-history me-2" style="color: #60a5fa;"></i>Activity History</h5>
+            <button class="btn btn-sm btn-outline-secondary ms-auto" onclick="refreshActivities()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="activity-card mb-4">
+            <div class="stats-row" id="activityStats">
+                <div class="stat-item">
+                    <div class="number" id="totalEarnings">₹0</div>
+                    <div class="label">Total Earned</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="totalWithdrawn">₹0</div>
+                    <div class="label">Withdrawn</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number purple" id="totalReferrals">0</div>
+                    <div class="label">Referrals</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number yellow" id="totalTasks">0</div>
+                    <div class="label">Tasks Done</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity List -->
+        <div class="activity-card">
+            <!-- Filter Tabs -->
+            <div class="filter-tabs" id="filterTabs">
+                <button class="btn-filter active" data-filter="all">All</button>
+                <button class="btn-filter" data-filter="credit">Earnings</button>
+                <button class="btn-filter" data-filter="debit">Withdrawals</button>
+                <button class="btn-filter" data-filter="referral">Referrals</button>
+                <button class="btn-filter" data-filter="task">Tasks</button>
+                <button class="btn-filter" data-filter="bonus">Bonuses</button>
+            </div>
+
+            <!-- Activities List -->
+            <div id="activitiesList">
+                <!-- Loading state -->
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-secondary mt-2">Loading activities...</p>
+                </div>
+            </div>
+
+            <!-- Load More -->
+            <div class="text-center py-3" id="loadMoreContainer" style="display: none;">
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadMoreActivities()">
+                    <i class="fas fa-chevron-down me-2"></i>Load More
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <div class="container d-flex justify-content-around">
+            <a href="dashboard.html" class="nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="earn.html" class="nav-link" data-page="earn">
+                <i class="fas fa-tasks"></i>
+                <span>Earn</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link" data-page="leaderboard">
+                <i class="fas fa-trophy"></i>
+                <span>Rank</span>
+            </a>
+            <a href="invite.html" class="nav-link" data-page="invite">
+                <i class="fas fa-user-plus"></i>
+                <span>Invite</span>
+            </a>
+            <a href="profile.html" class="nav-link active" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.replace('/login.html');
+        }
+
+        // ============================================
+        // STATE
+        // ============================================
+        
+        let allActivities = [];
+        let filteredActivities = [];
+        let currentFilter = 'all';
+        let currentLimit = 20;
+        let currentOffset = 0;
+        let hasMore = true;
+        let isLoading = false;
+
+        // ============================================
+        // API ENDPOINTS
+        // ============================================
+        
+        const API_BASE = '/api';
+        const ACTIVITY_ENDPOINT = `${API_BASE}/activities/list.php`;
+
+        // ============================================
+        // LOAD ACTIVITIES
+        // ============================================
+        
+        async function loadActivities(reset = true) {
+            if (isLoading) return;
+            
+            if (reset) {
+                currentOffset = 0;
+                allActivities = [];
+                hasMore = true;
+            }
+            
+            if (!hasMore) {
+                showToast('No more activities to load', 'info');
+                return;
+            }
+            
+            isLoading = true;
+            
+            try {
+                const response = await fetch(`${ACTIVITY_ENDPOINT}?limit=${currentLimit}&offset=${currentOffset}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('auth_token');
+                    window.location.replace('/login.html');
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const newActivities = result.data || [];
+                    const stats = result.stats || {};
+                    
+                    if (reset) {
+                        allActivities = newActivities;
+                    } else {
+                        allActivities = allActivities.concat(newActivities);
+                    }
+                    
+                    hasMore = newActivities.length >= currentLimit;
+                    currentOffset += newActivities.length;
+                    
+                    updateStats(stats);
+                    applyFilter(currentFilter);
+                    
+                    document.getElementById('loadMoreContainer').style.display = hasMore ? 'block' : 'none';
+                    
+                } else {
+                    showToast(result.message || 'Error loading activities', 'error');
+                }
+            } catch (error) {
+                console.error('Load activities error:', error);
+                showToast('Error loading activities', 'error');
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // ============================================
+        // UPDATE STATS
+        // ============================================
+        
+        function updateStats(stats) {
+            document.getElementById('totalEarnings').textContent = `₹${Math.round(stats.total_earnings || 0)}`;
+            document.getElementById('totalWithdrawn').textContent = `₹${Math.round(stats.total_withdrawn || 0)}`;
+            document.getElementById('totalReferrals').textContent = stats.total_referrals || 0;
+            document.getElementById('totalTasks').textContent = stats.total_tasks || 0;
+        }
+
+        // ============================================
+        // APPLY FILTER
+        // ============================================
+        
+        function applyFilter(filter) {
+            currentFilter = filter;
+            
+            if (filter === 'all') {
+                filteredActivities = allActivities;
+            } else {
+                filteredActivities = allActivities.filter(item => item.type === filter);
+            }
+            
+            renderActivities(filteredActivities);
+        }
+
+        // ============================================
+        // RENDER ACTIVITIES
+        // ============================================
+        
+        function renderActivities(activities) {
+            const container = document.getElementById('activitiesList');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h6>No Activities Found</h6>
+                        <p>Start earning by completing tasks or inviting friends!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = activities.map(item => {
+                const iconClass = getIconClass(item.type);
+                const icon = getIcon(item.type);
+                const amountClass = item.amount >= 0 ? 'positive' : 'negative';
+                const sign = item.amount >= 0 ? '+' : '';
+                const statusClass = item.status || 'completed';
+                const timeAgo = getTimeAgo(item.created_at);
+                
+                return `
+                    <div class="activity-item">
+                        <div class="icon-wrapper ${iconClass}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="info">
+                            <div class="title">${item.title || item.description || item.type}</div>
+                            <div class="desc">${item.description || item.type}</div>
+                            <div class="time">${timeAgo}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="amount ${amountClass}">${sign}₹${Math.round(item.amount).toLocaleString()}</div>
+                            <span class="status-badge ${statusClass}">${statusClass}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        
+        function getIcon(type) {
+            const icons = {
+                'credit': 'fa-arrow-down',
+                'debit': 'fa-arrow-up',
+                'referral': 'fa-gift',
+                'task': 'fa-tasks',
+                'bonus': 'fa-star',
+                'withdrawal': 'fa-money-bill-wave',
+                'admin_adjustment': 'fa-edit'
+            };
+            return icons[type] || 'fa-circle';
+        }
+
+        function getIconClass(type) {
+            const classes = {
+                'credit': 'credit',
+                'debit': 'debit',
+                'referral': 'referral',
+                'task': 'task',
+                'bonus': 'bonus',
+                'withdrawal': 'withdrawal'
+            };
+            return classes[type] || 'other';
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const past = new Date(date);
+            const diffMs = now - past;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return diffMins + 'm ago';
+            if (diffHours < 24) return diffHours + 'h ago';
+            if (diffDays < 7) return diffDays + 'd ago';
+            return past.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        }
+
+        // ============================================
+        // FILTER CLICK HANDLERS
+        // ============================================
+        
+        document.querySelectorAll('.btn-filter').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                applyFilter(filter);
+            });
+        });
+
+        // ============================================
+        // LOAD MORE
+        // ============================================
+        
+        function loadMoreActivities() {
+            loadActivities(false);
+        }
+
+        // ============================================
+        // REFRESH
+        // ============================================
+        
+        function refreshActivities() {
+            loadActivities(true);
+            showToast('Refreshed', 'success');
+        }
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+        
+        function showToast(message, type = 'info') {
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+            
+            const colors = {
+                success: 'bg-success',
+                error: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-info'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white ${colors[type]} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            
+            container.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        
+        loadActivities(true);
+        console.log('✅ Activity History page loaded');
+    </script>
+
+</body>
+</html>

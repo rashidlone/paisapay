@@ -1,0 +1,72 @@
+[28-Aug-2026 14:32:17 Asia/Kolkata] 📝 Referral recorded for user 28 (pending email verification)
+[28-Aug-2026 14:32:21 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.com
+[28-Aug-2026 14:40:54 Asia/Kolkata] 📝 Referral recorded for user 29 (pending email verification)
+[28-Aug-2026 14:40:56 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.com
+[28-Aug-2026 14:50:16 Asia/Kolkata] 📝 Referral recorded for user 30 (pending email verification)
+[28-Aug-2026 14:50:17 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.com
+[28-Aug-2026 14:50:42 Asia/Kolkata] PHP Parse error:  syntax error, unexpected token "use" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/verify.php on line 224
+[28-Aug-2026 14:50:49 Asia/Kolkata] PHP Parse error:  syntax error, unexpected token "use" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/verify.php on line 224
+[28-Aug-2026 14:50:56 Asia/Kolkata] PHP Parse error:  syntax error, unexpected token "use" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/verify.php on line 224
+[28-Aug-2026 14:52:35 Asia/Kolkata] PHP Parse error:  syntax error, unexpected token "use" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/verify.php on line 241
+[28-Aug-2026 15:01:35 Asia/Kolkata] 📝 Referral recorded for user 31 (pending email verification)
+[28-Aug-2026 15:01:40 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.com
+[28-Aug-2026 15:09:31 Asia/Kolkata] 📝 Referral recorded for user 32 (pending email verification)
+[28-Aug-2026 15:09:32 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.com
+[28-Aug-2026 15:10:31 Asia/Kolkata] 📝 Referral recorded for user 33 (pending email verification)
+[28-Aug-2026 15:10:33 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.com
+[28-Aug-2026 15:27:08 Asia/Kolkata] ✅ Verification email sent to: noreply.paisapay@gmail.con
+[28-Aug-2026 15:30:38 Asia/Kolkata] ✅ Verification email sent to: lonerashed5@gmail.com
+[28-Aug-2026 16:19:19 Asia/Kolkata] 📝 Referral recorded for user 36 (pending email verification)
+[28-Aug-2026 16:19:21 Asia/Kolkata] ✅ Verification email sent to: insha713@gmqil.com
+[28-Aug-2026 16:27:13 Asia/Kolkata] ✅ Verification email sent to: inshaqayum56@gmail.com
+[29-Aug-2026 13:35:48 Asia/Kolkata] ✅ Verification email sent to: lonerashed9@gmail.com
+[29-Aug-2026 15:10:48 Asia/Kolkata] 📝 Referral recorded for user 2 (pending email verification)
+[29-Aug-2026 15:10:49 Asia/Kolkata] ✅ Verification email sent to: raashid.lone@foundationworldschool.com
+[29-Aug-2026 15:25:08 Asia/Kolkata] PHP Warning:  require_once(/home/u226625657/domains/paisa-pay.online/public_html/api/auth/../classes/Database.php): Failed to open stream: No such file or directory in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 18
+[29-Aug-2026 15:25:08 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Failed opening required '/home/u226625657/domains/paisa-pay.online/public_html/api/auth/../classes/Database.php' (include_path='.:/opt/alt/php83/usr/share/pear:/opt/alt/php83/usr/share/php:/usr/share/pear:/usr/share/php') in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php:18
+Stack trace:
+#0 {main}
+  thrown in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 18
+[29-Aug-2026 15:26:05 Asia/Kolkata] PHP Warning:  Undefined array key "full_name" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 45
+[29-Aug-2026 15:28:21 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 27
+[29-Aug-2026 15:28:21 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:28:21 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:28:21 Asia/Kolkata] PHP Warning:  Undefined variable $user in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:28:21 Asia/Kolkata] PHP Warning:  Trying to access array offset on null in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:28:21 Asia/Kolkata] PHP Warning:  Undefined array key "full_name" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 27
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Undefined variable $user in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Trying to access array offset on null in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 41
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:28:56 Asia/Kolkata] PHP Warning:  Undefined array key "full_name" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 27
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Undefined variable $user in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Trying to access array offset on null in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 41
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:29:15 Asia/Kolkata] PHP Warning:  Undefined array key "full_name" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 27
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Undefined variable $user in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Trying to access array offset on null in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 41
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:29:27 Asia/Kolkata] PHP Warning:  Undefined array key "full_name" in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 43
+[29-Aug-2026 15:30:59 Asia/Kolkata] PHP Warning:  Undefined variable $referrer_id in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 27
+[29-Aug-2026 15:30:59 Asia/Kolkata] PHP Warning:  Undefined variable $bonus_amount in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:30:59 Asia/Kolkata] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in /home/u226625657/domains/paisa-pay.online/public_html/helpers/functions.php on line 14
+[29-Aug-2026 15:30:59 Asia/Kolkata] PHP Warning:  Undefined variable $user in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 15:30:59 Asia/Kolkata] PHP Warning:  Trying to access array offset on null in /home/u226625657/domains/paisa-pay.online/public_html/api/auth/test.php on line 29
+[29-Aug-2026 17:35:59 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class "Database" not found in /home/u226625657/domains/paisa-pay.online/public_html/config/database.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/u226625657/domains/paisa-pay.online/public_html/config/database.php on line 34

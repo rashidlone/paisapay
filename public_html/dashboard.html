@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - PaisaPay</title>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* ============================================
+           DASHBOARD STYLES
+           ============================================ */
+        
+        body {
+            padding-top: 56px !important;
+            padding-bottom: 70px !important;
+            background: #0a0e1a;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .stat-card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(108,60,225,0.3);
+            box-shadow: 0 4px 20px rgba(108,60,225,0.1);
+        }
+        .stat-card .number {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-card .label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .stat-card .icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .task-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            height: 100%;
+            position: relative;
+        }
+        .task-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(108,60,225,0.3);
+            box-shadow: 0 4px 20px rgba(108,60,225,0.1);
+        }
+        .task-card .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            margin-bottom: 6px;
+        }
+        .task-card .task-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .task-card .task-reward {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        .task-card .task-progress {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .task-card .completed-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #10b981;
+            color: white;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .task-card .disabled-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #10b981;
+        }
+        .task-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .task-card { position: relative; }
+        
+        .referral-code {
+            background: rgba(108,60,225,0.08);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            border: 1px dashed rgba(108,60,225,0.2);
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #1a2234;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item .badge { font-size: 10px; padding: 2px 10px; }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, rgba(108,60,225,0.08), rgba(155,89,182,0.04));
+            border: 1px solid rgba(108,60,225,0.15);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            background: #111827 !important;
+            border-top: 1px solid #1e293b;
+            padding: 4px 0 env(safe-area-inset-bottom);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+        }
+        .bottom-nav .nav-link {
+            color: #64748b !important;
+            text-align: center;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 48px;
+            text-decoration: none;
+        }
+        .bottom-nav .nav-link i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 1px;
+        }
+        .bottom-nav .nav-link.active {
+            color: #8B5CF6 !important;
+        }
+        .bottom-nav .nav-link.active i {
+            color: #8B5CF6 !important;
+        }
+        
+        @media (max-width: 480px) {
+            .stat-card .number { font-size: 20px; }
+            .stat-card { padding: 12px; }
+            .task-card .task-title { font-size: 12px; }
+            .referral-code { font-size: 12px; }
+            body { padding-top: 50px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+    ✅ TOP NAVIGATION - Independent
+    ============================================ -->
+<!-- ✅ NAV IFRAME -->
+  
+   <iframe 
+    src="/includes/nav.html" 
+    style="width:100%; height:56px; border:none; position:fixed; top:0; left:0; z-index:1000; background:transparent !important; overflow:visible;"
+    scrolling="no"
+    id="navIframe"
+    allowtransparency="true"
+></iframe>
+
+<script>
+    window.addEventListener('message', function(event) {
+        var iframe = document.getElementById('navIframe');
+        if (!iframe) return;
+        
+        if (event.data && event.data.type === 'expandNav') {
+            iframe.style.height = '400px';  // ✅ Increased from 300px to 400px
+            iframe.style.background = 'transparent';
+        } else if (event.data && event.data.type === 'collapseNav') {
+            iframe.style.height = '56px';
+            iframe.style.background = 'transparent';
+        }
+    });
+</script>
+
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
+    
+    <div class="container mt-3 mt-md-4 pb-5">
+        
+        <!-- Welcome Card -->
+        <div class="welcome-card mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h5 class="mb-0">Welcome, <span id="userName">User</span>!</h5><br>
+                    <p class="text-secondary small mb-0">
+                        Referral Code: <span class="referral-code" id="referralCode">Loading...</span>
+                    </p>
+                </div>
+                <button class="btn btn-outline-primary btn-sm" onclick="copyReferral()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row g-2 g-md-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="stat-card" onclick="window.location.href='withdraw.html'">
+                    <div class="icon"><i class="fas fa-wallet text-primary"></i></div>
+                    <div class="number" id="balance">₹0</div>
+                    <div class="label">Balance</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" onclick="window.location.href='invite.html'">
+                    <div class="icon"><i class="fas fa-users text-success"></i></div>
+                    <div class="number" id="referralCount">0</div>
+                    <div class="label">Referrals</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" onclick="window.location.href='earn.html'">
+                    <div class="icon"><i class="fas fa-tasks text-warning"></i></div>
+                    <div class="number" id="taskCount">0</div>
+                    <div class="label">Tasks Done</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card" onclick="window.location.href='leaderboard.html'">
+                    <div class="icon"><i class="fas fa-trophy text-info"></i></div>
+                    <div class="number" id="userRank">#0</div>
+                    <div class="label">Rank</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Tasks -->
+        <h5 class="text-white mb-3"><i class="fas fa-tasks me-2"></i>Active Tasks</h5>
+        <div id="activeTasks" class="row g-2 g-md-3 mb-4">
+            <!-- Loaded dynamically -->
+        </div>
+
+        <!-- Recent Activity -->
+        <h5 class="text-white mb-3"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+        <div class="card bg-dark text-white border-secondary" id="recentActivity">
+            <div class="card-body text-center text-secondary">No recent activity</div>
+        </div>
+                <!-- ✅ ADD THIS - See Full History Button -->
+        <div class="text-center mt-3">
+            <a href="activity.html" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-history me-2"></i>See Full History
+            </a>
+        </div>
+    </div>
+
+    <!-- ============================================
+    BOTTOM NAVIGATION - Fixed
+    ============================================ -->
+    
+    <nav class="bottom-nav">
+        <div class="container d-flex justify-content-around">
+            <a href="dashboard.html" class="nav-link active" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="earn.html" class="nav-link" data-page="earn">
+                <i class="fas fa-tasks"></i>
+                <span>Earn</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link" data-page="leaderboard">
+                <i class="fas fa-trophy"></i>
+                <span>Rank</span>
+            </a>
+            <a href="invite.html" class="nav-link" data-page="invite">
+                <i class="fas fa-user-plus"></i>
+                <span>Invite</span>
+            </a>
+            <a href="withdraw.html" class="nav-link" data-page="withdraw">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Withdraw</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ============================================
+        // ✅ AUTH CHECK - NO LOOP
+        // ============================================
+        
+        const token = localStorage.getItem('auth_token');
+        const userData = localStorage.getItem('user_data');
+        
+        if (!token || !userData) {
+            window.location.replace('/login.html');
+        }
+        
+        console.log('✅ User authenticated, loading dashboard');
+        
+        // ============================================
+        // ✅ LOAD USER DATA
+        // ============================================
+        
+        try {
+            const user = JSON.parse(userData);
+            document.getElementById('userName').textContent = user.full_name || 'User';
+            document.getElementById('referralCode').textContent = user.referral_code || 'Loading...';
+            const balance = user.wallet_balance || 0;
+            document.getElementById('balance').textContent = '₹' + Math.round(balance);
+            
+            // ✅ Update top nav balance if available
+            setTimeout(function() {
+                if (typeof ppUpdateBalance === 'function') {
+                    ppUpdateBalance(balance);
+                }
+            }, 500);
+        } catch (e) {
+            console.error('Error parsing user data:', e);
+        }
+        
+        // ============================================
+        // ✅ LOAD DASHBOARD DATA
+        // ============================================
+        
+        async function loadDashboard() {
+            try {
+                const response = await fetch('https://paisa-pay.online/api/user/dashboard.php', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    window.location.replace('/login.html');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    showToast(data.message || 'Error loading dashboard', 'error');
+                    return;
+                }
+                
+                const d = data.data;
+                
+                // Update stats
+                document.getElementById('referralCount').textContent = d.stats?.referrals?.total || 0;
+                document.getElementById('taskCount').textContent = d.stats?.tasks?.total || 0;
+                document.getElementById('userRank').textContent = '#0';
+                
+                // Update wallet balance
+                if (d.user?.wallet_balance !== undefined) {
+                    const balance = d.user.wallet_balance;
+                    document.getElementById('balance').textContent = '₹' + Math.round(balance);
+                    
+                    // ✅ Update top nav balance
+                    setTimeout(function() {
+                        if (typeof ppUpdateBalance === 'function') {
+                            ppUpdateBalance(balance);
+                        }
+                    }, 100);
+                }
+                
+                // Render tasks
+                renderTasks(d.active_tasks || []);
+                
+                // Render activity
+                renderActivity(d.recent_transactions || []);
+                
+            } catch (error) {
+                console.error('Dashboard error:', error);
+                showToast('Error loading dashboard', 'error');
+            }
+        }
+        
+        // ============================================
+        // ✅ RENDER TASKS
+        // ============================================
+        
+        function renderTasks(tasks) {
+            const container = document.getElementById('activeTasks');
+            
+            if (!tasks || tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="card bg-dark text-white text-center py-4 border-secondary">
+                            <i class="fas fa-inbox fa-2x text-secondary mb-2"></i>
+                            <p class="text-secondary mb-0">No active tasks</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const displayTasks = tasks.slice(0, 4);
+            
+            container.innerHTML = displayTasks.map(task => {
+                const isCompleted = (task.completed_today || 0) >= (task.daily_limit || 1);
+                const disabledClass = isCompleted ? 'disabled' : '';
+                
+                return `
+                    <div class="col-6 col-md-3">
+                        <div class="task-card ${disabledClass}" onclick="${isCompleted ? '' : `window.location.href='earn.html'`}">
+                            ${isCompleted ? '<div class="disabled-overlay"><i class="fas fa-check-circle me-1"></i>Done</div>' : ''}
+                            <div class="icon bg-primary-gradient">
+                                <i class="fas ${task.icon || 'fa-link'}"></i>
+                            </div>
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-reward">₹${task.reward_amount}</div>
+                            <div class="task-progress">
+                                ${task.completed_today || 0}/${task.daily_limit || 1} today
+                                ${isCompleted ? ' ✅' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // ✅ RENDER ACTIVITY
+        // ============================================
+        
+        function renderActivity(transactions) {
+            const container = document.getElementById('recentActivity');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = '<div class="card-body text-center text-secondary">No recent activity</div>';
+                return;
+            }
+            
+            container.innerHTML = transactions.slice(0, 5).map(tx => `
+                <div class="list-item px-3">
+                    <div>
+                        <span class="badge ${tx.transaction_type === 'credit' || tx.transaction_type === 'task' || tx.transaction_type === 'referral' || tx.transaction_type === 'bonus' ? 'bg-success' : 'bg-danger'} me-2">
+                            ${tx.transaction_type}
+                        </span>
+                        <span class="text-secondary small">${tx.description || tx.transaction_type}</span>
+                    </div>
+                    <div class="text-end">
+                        <span class="${tx.transaction_type === 'credit' || tx.transaction_type === 'task' || tx.transaction_type === 'referral' || tx.transaction_type === 'bonus' ? 'text-success' : 'text-danger'}">
+                            ${tx.transaction_type === 'credit' || tx.transaction_type === 'task' || tx.transaction_type === 'referral' || tx.transaction_type === 'bonus' ? '+' : '-'}₹${Math.round(tx.amount)}
+                        </span>
+                        <small class="text-secondary d-block">${new Date(tx.created_at).toLocaleDateString()}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // ============================================
+        // ✅ COPY REFERRAL
+        // ============================================
+        
+        window.copyReferral = function() {
+            const code = document.getElementById('referralCode').textContent;
+            if (code && code !== 'Loading...') {
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('Referral code copied!', 'success');
+                }).catch(() => {
+                    const input = document.createElement('input');
+                    input.value = code;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    showToast('Referral code copied!', 'success');
+                });
+            }
+        };
+        
+        // ============================================
+        // ✅ TOAST
+        // ============================================
+        
+        function showToast(message, type = 'info') {
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+            
+            const colors = {
+                success: 'bg-success',
+                error: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-info'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white ${colors[type]} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container position-fixed top-0 end-0 p-3';
+                document.body.appendChild(container);
+            }
+            
+            container.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+        }
+        
+        // ============================================
+        // ✅ LOAD ON PAGE LOAD
+        // ============================================
+        
+        loadDashboard();
+        
+        // Refresh every 30 seconds
+        setInterval(() => {
+            loadDashboard();
+        }, 30000);
+        
+        console.log('✅ Dashboard loaded successfully');
+    </script>
+
+</body>
+</html>
