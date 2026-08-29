@@ -2,9 +2,6 @@ name: Generate Code Markdown
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: write
@@ -19,9 +16,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Sync with latest main
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
       - name: Delete old public_html and CODE.md
         run: |
-          echo "Deleting old public_html folder..."
+          echo "Deleting old public_html..."
           rm -rf public_html
 
           echo "Deleting old CODE.md..."
@@ -37,7 +39,6 @@ jobs:
           echo "Extracting public_html.zip..."
 
           mkdir -p public_html
-
           unzip -o public_html.zip -d public_html
 
           echo "Extraction completed."
@@ -148,28 +149,19 @@ jobs:
 
           done
 
-          echo ""
-          echo "================================"
-          echo "CODE.md generated successfully"
-          echo "================================"
-          echo ""
-
+          echo "CODE.md generated successfully."
+          echo "Lines:"
           wc -l CODE.md
+          echo "Size:"
           du -h CODE.md
 
-      - name: Commit and push changes
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          echo "Getting latest changes from GitHub..."
-          git fetch origin main
-
-          echo "Rebasing on latest main..."
-          git rebase origin/main
-
-          echo "Adding public_html and CODE.md..."
-          git add public_html CODE.md
+          echo "Adding changes..."
+          git add -A public_html CODE.md
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
