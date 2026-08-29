@@ -1,0 +1,29 @@
+name: Unzip public_html
+
+on:
+  workflow_dispatch:
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip public_html.zip
+        run: |
+          rm -rf public_html
+          mkdir -p public_html
+          unzip -o public_html.zip -d public_html
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public_html
+          git commit -m "Extract public_html.zip" || echo "No changes to commit"
+          git push
