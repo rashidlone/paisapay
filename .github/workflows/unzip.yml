@@ -25,7 +25,11 @@ jobs:
             unzip -o public_html.zip -d public_html
           fi
 
-      - name: Generate CODE.md
+      - name: Delete old CODE.md
+        run: |
+          rm -f CODE.md
+
+      - name: Generate new CODE.md
         run: |
           echo "# Repository Source Code" > CODE.md
           echo "" >> CODE.md
@@ -82,16 +86,13 @@ jobs:
 
           done
 
-      - name: Commit CODE.md
+      - name: Commit and push CODE.md
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add CODE.md
+          git add -A
 
-          if git diff --cached --quiet; then
-            echo "No changes"
-          else
-            git commit -m "Generate complete source code documentation"
-            git push
-          fi
+          git commit -m "Regenerate CODE.md" || echo "No changes to commit"
+
+          git push
