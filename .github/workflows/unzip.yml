@@ -33,10 +33,10 @@ jobs:
           find . -type f \
             ! -path "./.git/*" \
             ! -path "./.github/*" \
+            ! -path "./vendor/*" \
+            ! -path "./node_modules/*" \
             ! -path "./CODE.md" \
             ! -path "./public_html.zip" \
-            ! -path "./node_modules/*" \
-            ! -path "./vendor/*" \
             | sort | while read -r file
           do
             echo "Processing: $file"
