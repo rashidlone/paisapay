@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Leaderboard - PaisaPay</title>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .podium-card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+            position: relative;
+        }
+        .podium-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(108,60,225,0.3);
+        }
+        .podium-card .medal {
+            font-size: 36px;
+            margin-bottom: 6px;
+        }
+        .podium-card .rank-num {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #64748b;
+        }
+        .podium-card .name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .podium-card .earnings {
+            font-weight: 700;
+            color: #f59e0b;
+            font-size: 16px;
+        }
+        .podium-card .sub {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .podium-card.gold { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+        .podium-card.silver { border-color: rgba(192,192,192,0.2); background: rgba(192,192,192,0.05); }
+        .podium-card.bronze { border-color: rgba(205,127,50,0.2); background: rgba(205,127,50,0.05); }
+        
+        .rank-list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid #1a2234;
+            transition: all 0.2s ease;
+            gap: 12px;
+        }
+        .rank-list-item:hover {
+            background: rgba(108,60,225,0.03);
+        }
+        .rank-list-item .position {
+            font-weight: 700;
+            font-size: 14px;
+            color: #64748b;
+            min-width: 30px;
+        }
+        .rank-list-item .position.top1 { color: #f59e0b; font-size: 18px; }
+        .rank-list-item .position.top2 { color: #94a3b8; font-size: 18px; }
+        .rank-list-item .position.top3 { color: #cd7f32; font-size: 18px; }
+        .rank-list-item .user-info { flex: 1; min-width: 0; }
+        .rank-list-item .user-info .name { font-weight: 500; font-size: 14px; }
+        .rank-list-item .user-info .sub { font-size: 11px; color: #64748b; }
+        .rank-list-item .user-earnings { font-weight: 700; color: #f59e0b; font-size: 14px; flex-shrink: 0; }
+        .rank-list-item .user-earnings .label { font-weight: 400; color: #64748b; font-size: 10px; display: block; }
+        .rank-list-item.current-user {
+            background: rgba(108,60,225,0.08);
+            border-left: 3px solid #6C3CE1;
+        }
+        .rank-list-item .badge-you {
+            background: #6C3CE1;
+            color: white;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .filter-btn {
+            background: transparent;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            border-color: #6C3CE1;
+            color: #fff;
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .your-rank-card {
+            background: linear-gradient(135deg, rgba(108,60,225,0.1), rgba(155,89,182,0.05));
+            border: 1px solid rgba(108,60,225,0.2);
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .your-rank-card .rank-number {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .your-rank-card .rank-label {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .your-rank-card .rank-earnings {
+            text-align: right;
+        }
+        .your-rank-card .rank-earnings .amount {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        
+        .bottom-nav {
+            background: #111827 !important;
+            border-top: 1px solid #1e293b;
+            padding: 4px 0 env(safe-area-inset-bottom);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+        }
+        .bottom-nav .nav-link {
+            color: #64748b !important;
+            text-align: center;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 48px;
+            text-decoration: none;
+        }
+        .bottom-nav .nav-link i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 1px;
+        }
+        .bottom-nav .nav-link.active {
+            color: #8B5CF6 !important;
+        }
+        .bottom-nav .nav-link.active i {
+            color: #8B5CF6 !important;
+        }
+        
+        @media (max-width: 480px) {
+            .podium-card .medal { font-size: 28px; }
+            .podium-card .name { font-size: 13px; }
+            .podium-card .earnings { font-size: 14px; }
+            .your-rank-card .rank-number { font-size: 22px; }
+            .your-rank-card .rank-earnings .amount { font-size: 18px; }
+            .rank-list-item { padding: 8px 10px; gap: 8px; }
+            .rank-list-item .user-info .name { font-size: 12px; }
+            .rank-list-item .user-earnings { font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+  <!-- ============================================
+    ✅ TOP NAVIGATION - Independent
+    ============================================ -->
+    
+    <iframe 
+    src="/includes/nav.html" 
+    style="width:100%; height:56px; border:none; position:fixed; top:0; left:0; z-index:1000; background:transparent !important; overflow:visible;"
+    scrolling="no"
+    id="navIframe"
+    allowtransparency="true"
+></iframe>
+
+<script>
+    window.addEventListener('message', function(event) {
+        var iframe = document.getElementById('navIframe');
+        if (!iframe) return;
+        
+        if (event.data && event.data.type === 'expandNav') {
+            iframe.style.height = '400px';  // ✅ Increased from 300px to 400px
+            iframe.style.background = 'transparent';
+        } else if (event.data && event.data.type === 'collapseNav') {
+            iframe.style.height = '56px';
+            iframe.style.background = 'transparent';
+        }
+    });
+</script>
+
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
+    
+    <div class="container mt-5 pt-4 pb-5">
+        
+        <!-- Title -->
+        <div class="text-center mb-4">
+            <i class="fas fa-trophy fa-3x text-warning mb-2"></i>
+            <h4 class="text-white">Top Earners</h4>
+            <p class="text-secondary small">See who's leading the race</p>
+        </div>
+
+        <!-- Period Filters -->
+        <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+            <button class="filter-btn active" data-period="weekly" onclick="loadLeaderboard('weekly')">Weekly</button>
+            <button class="filter-btn" data-period="monthly" onclick="loadLeaderboard('monthly')">Monthly</button>
+            <button class="filter-btn" data-period="all_time" onclick="loadLeaderboard('all_time')">All Time</button>
+        </div>
+
+        <!-- Your Rank -->
+        <div class="your-rank-card mb-4" id="yourRankCard" style="display: none;">
+            <div>
+                <div class="rank-label">Your Rank</div>
+                <div class="rank-number" id="yourRank">#0</div>
+            </div>
+            <div class="rank-earnings">
+                <div class="rank-label">Your Earnings</div>
+                <div class="amount" id="yourEarnings">₹0</div>
+            </div>
+        </div>
+
+        <!-- Top 3 Podium -->
+        <div id="topThreeContainer" class="row g-3 mb-4">
+            <div class="col-12 text-center text-secondary py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2">Loading top earners...</p>
+            </div>
+        </div>
+
+        <!-- Full List -->
+        <h5 class="text-white mb-3"><i class="fas fa-list me-2"></i>All Rankings</h5>
+        <div class="card bg-dark text-white border-secondary" id="leaderboardList">
+            <div class="card-body text-center text-secondary py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2">Loading rankings...</p>
+            </div>
+        </div>
+        
+        <!-- Achievement Badge -->
+        <div class="mt-4 text-center">
+            <div class="card bg-dark text-white border-secondary">
+                <div class="card-body py-3">
+                    <i class="fas fa-medal fa-2x text-warning mb-1"></i>
+                    <p class="text-secondary small mb-0">Keep inviting friends and completing tasks to climb the leaderboard!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    BOTTOM NAVIGATION - FIXED
+    ============================================ -->
+    
+    <nav class="bottom-nav">
+        <div class="container d-flex justify-content-around">
+            <a href="dashboard.html" class="nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="earn.html" class="nav-link" data-page="earn">
+                <i class="fas fa-tasks"></i>
+                <span>Earn</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link active" data-page="leaderboard">
+                <i class="fas fa-trophy"></i>
+                <span>Rank</span>
+            </a>
+            <a href="invite.html" class="nav-link" data-page="invite">
+                <i class="fas fa-user-plus"></i>
+                <span>Invite</span>
+            </a>
+            <a href="withdraw.html" class="nav-link" data-page="withdraw">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Withdraw</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // ============================================
+    // ✅ AUTH CHECK - NO REDIRECT LOOP
+    // ============================================
+    
+    const token = localStorage.getItem('auth_token');
+    const userData = localStorage.getItem('user_data');
+    
+    if (!token || !userData) {
+        window.location.replace('/login.html');
+    }
+    
+    console.log('✅ User authenticated, loading leaderboard');
+    
+    // ============================================
+    // ✅ PRIVACY FUNCTION - Hide Name
+    // ============================================
+    
+    function hideName(name) {
+        if (!name) return 'User';
+        name = name.trim();
+        const parts = name.split(' ');
+        const firstName = parts[0] || '';
+        const lastName = parts.slice(1).join(' ') || '';
+        
+        let hiddenFirstName = firstName;
+        if (firstName.length > 3) {
+            hiddenFirstName = firstName.substring(0, firstName.length - 3) + '***';
+        } else if (firstName.length > 1) {
+            hiddenFirstName = firstName.charAt(0) + '**';
+        }
+        
+        let hiddenLastName = lastName;
+        if (lastName.length > 2) {
+            hiddenLastName = lastName.substring(0, lastName.length - 2) + '**';
+        } else if (lastName.length > 0) {
+            hiddenLastName = lastName.charAt(0) + '*';
+        }
+        
+        if (hiddenLastName && hiddenLastName !== '*') {
+            return hiddenFirstName + ' ' + hiddenLastName;
+        }
+        return hiddenFirstName;
+    }
+    
+    // ============================================
+    // ✅ STATE
+    // ============================================
+    
+    let currentPeriod = 'weekly';
+    let currentUserId = null;
+    let currentUserName = '';
+    
+    try {
+        const user = JSON.parse(userData);
+        currentUserId = user.id;
+        currentUserName = user.full_name || 'User';
+        // ✅ Update wallet balance from localStorage (fallback)
+        const balance = parseFloat(user.wallet_balance || 0);
+        document.getElementById('walletBalance').textContent = '₹' + Math.round(balance);
+    } catch (e) {
+        console.error('Error parsing user data:', e);
+    }
+    
+    // ============================================
+    // ✅ UPDATE WALLET BALANCE IN TOP BAR
+    // ============================================
+    
+    function updateWalletBalance(balance) {
+        const walletEl = document.getElementById('walletBalance');
+        if (walletEl) {
+            const rounded = Math.round(balance || 0);
+            walletEl.textContent = '₹' + rounded;
+        }
+    }
+    
+    // ============================================
+    // ✅ LOAD LEADERBOARD
+    // ============================================
+    
+    async function loadLeaderboard(period = 'weekly') {
+        currentPeriod = period;
+        
+        // Update active filter
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.period === period);
+        });
+        
+        // Show loading
+        document.getElementById('topThreeContainer').innerHTML = `
+            <div class="col-12 text-center text-secondary py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2">Loading top earners...</p>
+            </div>
+        `;
+        document.getElementById('leaderboardList').innerHTML = `
+            <div class="card-body text-center text-secondary py-4">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2">Loading rankings...</p>
+            </div>
+        `;
+        document.getElementById('yourRankCard').style.display = 'none';
+        
+        try {
+            const response = await fetch(`https://paisa-pay.online/api/leaderboard/index.php?period=${period}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+                window.location.replace('/login.html');
+                return;
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                showToast(data.message || 'Error loading leaderboard', 'error');
+                return;
+            }
+            
+            const result = data.data;
+            
+            // ✅ Update wallet balance in top bar from API
+            updateWalletBalance(result.balance || result.user_wallet || 0);
+            
+            // Render top 3
+            renderTopThree(result.top_three || []);
+            
+            // Render your rank
+            renderYourRank(result);
+            
+            // Render full list
+            renderLeaderboardList(result.rankings || [], result.user_position);
+            
+        } catch (error) {
+            console.error('Leaderboard error:', error);
+            showToast('Error loading leaderboard', 'error');
+        }
+    }
+    
+    // ============================================
+    // ✅ RENDER TOP 3
+    // ============================================
+    
+    function renderTopThree(users) {
+        const container = document.getElementById('topThreeContainer');
+        
+        if (!users || users.length === 0) {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="card bg-dark text-white text-center py-4 border-secondary">
+                        <i class="fas fa-inbox fa-3x text-secondary mb-2"></i>
+                        <p class="text-secondary mb-0">No rankings yet. Be the first!</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        const medals = ['🥇', '🥈', '🥉'];
+        const classes = ['gold', 'silver', 'bronze'];
+        
+        while (users.length < 3) {
+            users.push({ full_name: '---', total_earnings: 0 });
+        }
+        
+        const top3 = users.slice(0, 3);
+        
+        container.innerHTML = top3.map((user, index) => {
+            let displayName = user.full_name || 'User';
+            if (user.id != currentUserId) {
+                displayName = hideName(displayName);
+            }
+            
+            const earningAmount = Math.round(user.total_earnings || 0);
+            
+            return `
+                <div class="col-4">
+                    <div class="podium-card ${classes[index] || ''}">
+                        <div class="rank-num">#${index + 1}</div>
+                        <div class="medal">${medals[index] || ''}</div>
+                        <div class="name">${displayName}</div>
+                        <div class="earnings">₹${earningAmount}</div>
+                        <div class="sub">${user.referral_count || 0} referrals</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // ============================================
+    // ✅ RENDER YOUR RANK
+    // ============================================
+    
+    function renderYourRank(data) {
+        const card = document.getElementById('yourRankCard');
+        
+        if (data.user_position && data.user_position > 0) {
+            card.style.display = 'flex';
+            document.getElementById('yourRank').textContent = '#' + data.user_position;
+            const userEarnings = Math.round(data.user_earnings || 0);
+            document.getElementById('yourEarnings').textContent = '₹' + userEarnings;
+        } else {
+            card.style.display = 'none';
+        }
+    }
+    
+    // ============================================
+    // ✅ RENDER LEADERBOARD LIST
+    // ============================================
+    
+    function renderLeaderboardList(rankings, userPosition) {
+        const container = document.getElementById('leaderboardList');
+        
+        if (!rankings || rankings.length === 0) {
+            container.innerHTML = `
+                <div class="card-body text-center text-secondary py-4">
+                    <i class="fas fa-inbox fa-3x text-secondary mb-2"></i>
+                    <p class="mb-0">No rankings available for this period</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const displayRankings = rankings.slice(0, 100);
+        
+        let html = '<div class="card-body p-0">';
+        
+        displayRankings.forEach((user, index) => {
+            const rank = index + 1;
+            const isUser = user.is_user || (currentUserId && user.id == currentUserId);
+            
+            let positionClass = 'position';
+            if (rank === 1) positionClass += ' top1';
+            else if (rank === 2) positionClass += ' top2';
+            else if (rank === 3) positionClass += ' top3';
+            
+            let medal = '';
+            if (rank === 1) medal = '🥇';
+            else if (rank === 2) medal = '🥈';
+            else if (rank === 3) medal = '🥉';
+            
+            let displayName = user.full_name || 'User';
+            if (!isUser) {
+                displayName = hideName(displayName);
+            }
+            
+            const earningAmount = Math.round(user.total_earnings || 0);
+            
+            html += `
+                <div class="rank-list-item ${isUser ? 'current-user' : ''}">
+                    <div class="${positionClass}">
+                        ${medal || rank}
+                    </div>
+                    <div class="user-info">
+                        <div class="name">
+                            ${displayName}
+                            ${isUser ? '<span class="badge-you">YOU</span>' : ''}
+                        </div>
+                        <div class="sub">${user.referral_count || 0} referrals · ${user.task_count || 0} tasks</div>
+                    </div>
+                    <div class="user-earnings">
+                        ₹${earningAmount}
+                        <span class="label">earned</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        if (rankings.length > 100) {
+            html += `<div class="text-center text-secondary py-2 small">Showing top 100 of ${rankings.length}</div>`;
+        }
+        
+        container.innerHTML = html;
+    }
+    
+    // ============================================
+    // ✅ TOAST
+    // ============================================
+    
+    function showToast(message, type = 'info') {
+        document.querySelectorAll('.toast').forEach(t => t.remove());
+        
+        const colors = {
+            success: 'bg-success',
+            error: 'bg-danger',
+            warning: 'bg-warning',
+            info: 'bg-info'
+        };
+        
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white ${colors[type]} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            document.body.appendChild(container);
+        }
+        
+        container.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+        bsToast.show();
+    }
+    
+    // ============================================
+    // ✅ LOAD ON PAGE LOAD
+    // ============================================
+    
+    loadLeaderboard('weekly');
+    
+    setInterval(() => {
+        loadLeaderboard(currentPeriod);
+    }, 60000);
+    
+    console.log('✅ Leaderboard loaded successfully');
+</script>
+
+</body>
+</html>

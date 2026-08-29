@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profile - PaisaPay</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            padding-top: 56px !important;
+            padding-bottom: 70px !important;
+            background: #0a0e1a;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .profile-card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .detail-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #1a2234;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-item .label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .detail-item .value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .detail-item .value .edit-input {
+            background: #1a2234;
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: white;
+            font-size: 14px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .detail-item .value .edit-input:focus {
+            outline: none;
+            border-color: #6C3CE1;
+            box-shadow: 0 0 0 3px rgba(108,60,225,0.2);
+        }
+        .inline-edit-icon {
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .inline-edit-icon:hover {
+            background: #1a2234;
+            color: #8B5CF6;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            border: none;
+            padding: 10px 24px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(108,60,225,0.3);
+            color: white;
+        }
+        .btn-outline-secondary {
+            border-color: #2a3a4a;
+            color: #94a3b8;
+        }
+        .btn-outline-secondary:hover {
+            background: #1a2234;
+            border-color: #3a4a5a;
+            color: white;
+        }
+        .btn-success {
+            background: #10b981;
+            border: none;
+            padding: 6px 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            color: white;
+            font-size: 13px;
+        }
+        .btn-success:hover {
+            background: #059669;
+            color: white;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            border: none;
+            padding: 6px 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+            color: white;
+            font-size: 13px;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+            color: white;
+        }
+        
+        .bottom-nav {
+            background: #111827 !important;
+            border-top: 1px solid #1e293b;
+            padding: 4px 0 env(safe-area-inset-bottom);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+        }
+        .bottom-nav .nav-link {
+            color: #64748b !important;
+            text-align: center;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 48px;
+            text-decoration: none;
+        }
+        .bottom-nav .nav-link i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 1px;
+        }
+        .bottom-nav .nav-link.active {
+            color: #8B5CF6 !important;
+        }
+        .bottom-nav .nav-link.active i {
+            color: #8B5CF6 !important;
+        }
+        
+        .toast-container {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .phone-add-btn {
+            color: #60a5fa;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px dashed rgba(96,165,250,0.3);
+            transition: all 0.2s;
+            background: rgba(96,165,250,0.05);
+        }
+        .phone-add-btn:hover {
+            background: rgba(96,165,250,0.1);
+            border-color: #60a5fa;
+        }
+        
+        .phone-missing {
+            color: #fbbf24;
+            font-weight: 400;
+        }
+        
+        .phone-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .phone-input-group input {
+            background: #1a2234;
+            border: 1px solid #2a3a4a;
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: white;
+            font-size: 14px;
+            min-width: 180px;
+        }
+        .phone-input-group input:focus {
+            outline: none;
+            border-color: #6C3CE1;
+            box-shadow: 0 0 0 3px rgba(108,60,225,0.2);
+        }
+        .phone-input-group .btn-sm {
+            padding: 6px 14px;
+            font-size: 13px;
+        }
+        
+        .modal-content {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+        }
+        .modal-header {
+            border-bottom: 1px solid #1a2234;
+        }
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            border-top: 1px solid #1a2234;
+        }
+        .form-control {
+            background: #1a2234;
+            border: 1px solid #2a3a4a;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+        .form-control:focus {
+            background: #1a2234;
+            border-color: #6C3CE1;
+            box-shadow: 0 0 0 3px rgba(108,60,225,0.2);
+            color: white;
+        }
+        .form-control::placeholder {
+            color: #64748b;
+        }
+        .form-label {
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        @media (max-width: 480px) {
+            .profile-avatar {
+                width: 64px;
+                height: 64px;
+                font-size: 24px;
+            }
+            .detail-item .value {
+                font-size: 14px;
+            }
+            .phone-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .phone-input-group input {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAV IFRAME -->
+    <iframe 
+        src="/includes/nav.html" 
+        style="width:100%; height:56px; border:none; position:fixed; top:0; left:0; z-index:1000; background:transparent !important; overflow:visible;"
+        scrolling="no"
+        id="navIframe"
+        allowtransparency="true">
+    </iframe>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            var iframe = document.getElementById('navIframe');
+            if (!iframe) return;
+            if (event.data && event.data.type === 'expandNav') {
+                iframe.style.height = '400px';
+                iframe.style.background = 'transparent';
+            } else if (event.data && event.data.type === 'collapseNav') {
+                iframe.style.height = '56px';
+                iframe.style.background = 'transparent';
+            }
+        });
+    </script>
+
+    <div class="container mt-3 mt-md-4 pb-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="text-white mb-0"><i class="fas fa-user-circle me-2" style="color: #8B5CF6;"></i>My Profile</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="loadProfile()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+
+        <div class="profile-card">
+            <!-- Profile Header -->
+            <div class="d-flex align-items-center gap-3 mb-4 pb-3" style="border-bottom: 1px solid #1a2234;">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h5 class="text-white mb-0" id="displayName">Loading...</h5>
+                    <span class="text-secondary small" id="displayEmail">Loading...</span>
+                    <div class="mt-1">
+                        <span class="badge bg-success" id="verifyBadge">Verified</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Details -->
+            <div id="profileDetails">
+                <!-- Full Name -->
+                <div class="detail-item">
+                    <div class="label"><i class="far fa-user me-1"></i>Full Name</div>
+                    <div class="value">
+                        <span id="profileFullName">--</span>
+                        <span class="inline-edit-icon" onclick="startEdit()">
+                            <i class="fas fa-pen"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="detail-item">
+                    <div class="label"><i class="far fa-envelope me-1"></i>Email Address</div>
+                    <div class="value" id="profileEmail">--</div>
+                </div>
+
+                <!-- Phone Number with Add Option -->
+                <div class="detail-item">
+                    <div class="label"><i class="fas fa-phone me-1"></i>Phone Number</div>
+                    <div class="value" id="phoneContainer">
+                        <span id="profilePhone">--</span>
+                        <span id="phoneActions"></span>
+                    </div>
+                </div>
+
+                <!-- Referral Code -->
+                <div class="detail-item">
+                    <div class="label"><i class="fas fa-gift me-1"></i>Referral Code</div>
+                    <div class="value">
+                        <span id="profileReferral" style="font-family: monospace; letter-spacing: 1px;">--</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="copyReferral()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Member Since -->
+                <div class="detail-item">
+                    <div class="label"><i class="fas fa-calendar me-1"></i>Member Since</div>
+                    <div class="value" id="profileMemberSince">--</div>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-3 pt-3" style="border-top: 1px solid #1a2234;">
+                <button class="btn btn-primary btn-sm" onclick="saveProfile()">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="resetProfile()">
+                    <i class="fas fa-undo me-2"></i>Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    ADD PHONE MODAL
+    ============================================ -->
+    
+    <div class="modal fade" id="phoneModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title text-white"><i class="fas fa-phone me-2" style="color: #60a5fa;"></i>Add Phone Number</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="phoneForm">
+                        <div class="mb-3">
+                            <label class="form-label">Country Code</label>
+                            <select class="form-control" id="phoneCountryCode">
+                                <option value="+91">🇮🇳 +91 (India)</option>
+                                <option value="+1">🇺🇸 +1 (USA)</option>
+                                <option value="+44">🇬🇧 +44 (UK)</option>
+                                <option value="+61">🇦🇺 +61 (Australia)</option>
+                                <option value="+81">🇯🇵 +81 (Japan)</option>
+                                <option value="+86">🇨🇳 +86 (China)</option>
+                                <option value="+92">🇵🇰 +92 (Pakistan)</option>
+                                <option value="+880">🇧🇩 +880 (Bangladesh)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phoneNumberInput" placeholder="Enter phone number" required>
+                            <div class="form-text">Enter your phone number without the country code</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="savePhoneNumber()">Save Phone Number</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+        <div class="container d-flex justify-content-around">
+            <a href="dashboard.html" class="nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="earn.html" class="nav-link" data-page="earn">
+                <i class="fas fa-tasks"></i>
+                <span>Earn</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link" data-page="leaderboard">
+                <i class="fas fa-trophy"></i>
+                <span>Rank</span>
+            </a>
+            <a href="invite.html" class="nav-link" data-page="invite">
+                <i class="fas fa-user-plus"></i>
+                <span>Invite</span>
+            </a>
+            <a href="profile.html" class="nav-link active" data-page="profile">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+            window.location.replace('/login.html');
+        }
+
+        let profileData = null;
+        let originalData = null;
+        let isEditing = false;
+
+        // ============================================
+        // API ENDPOINTS
+        // ============================================
+        
+        const API_BASE = '/api';
+        const PROFILE_ENDPOINT = `${API_BASE}/user/profile.php`;
+
+        // ============================================
+        // LOAD PROFILE
+        // ============================================
+        
+        async function loadProfile() {
+            try {
+                showToast('Loading profile...', 'info');
+                
+                const response = await fetch(PROFILE_ENDPOINT, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+                if (response.status === 401) {
+                    localStorage.removeItem('auth_token');
+                    window.location.replace('/login.html');
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    showToast(result.message || 'Error loading profile', 'error');
+                    return;
+                }
+
+                profileData = result.data;
+                originalData = { ...result.data };
+                renderProfile();
+                showToast('Profile loaded successfully', 'success');
+                
+            } catch (error) {
+                console.error('Load profile error:', error);
+                showToast('Error loading profile', 'error');
+            }
+        }
+
+        // ============================================
+        // RENDER PROFILE
+        // ============================================
+        
+        function renderProfile() {
+            if (!profileData) return;
+            
+            document.getElementById('displayName').textContent = profileData.full_name || '--';
+            document.getElementById('displayEmail').textContent = profileData.email || '--';
+            document.getElementById('profileFullName').textContent = profileData.full_name || '--';
+            document.getElementById('profileEmail').textContent = profileData.email || '--';
+            document.getElementById('profileReferral').textContent = profileData.referral_code || '--';
+            
+            // Phone Number with Add option
+            const phoneSpan = document.getElementById('profilePhone');
+            const phoneActions = document.getElementById('phoneActions');
+            
+            if (profileData.phone_number && profileData.phone_number.trim() !== '') {
+                phoneSpan.textContent = profileData.phone_number;
+                phoneSpan.className = 'text-white';
+                phoneActions.innerHTML = `
+                    <span class="inline-edit-icon" onclick="editPhone()" title="Edit phone number">
+                        <i class="fas fa-pen"></i>
+                    </span>
+                `;
+            } else {
+                phoneSpan.textContent = 'No phone number added';
+                phoneSpan.className = 'phone-missing';
+                phoneActions.innerHTML = `
+                    <button class="btn btn-success btn-sm" onclick="openPhoneModal()">
+                        <i class="fas fa-plus me-1"></i>Add Phone
+                    </button>
+                `;
+            }
+            
+            if (profileData.created_at) {
+                const date = new Date(profileData.created_at);
+                document.getElementById('profileMemberSince').textContent = date.toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+            
+            const badge = document.getElementById('verifyBadge');
+            if (profileData.is_verified) {
+                badge.textContent = '✓ Verified';
+                badge.className = 'badge bg-success';
+            } else {
+                badge.textContent = '⚠ Pending';
+                badge.className = 'badge bg-warning';
+            }
+        }
+
+        // ============================================
+        // EDIT NAME
+        // ============================================
+        
+        function startEdit() {
+            if (isEditing) return;
+            isEditing = true;
+
+            const span = document.getElementById('profileFullName');
+            const container = span.parentElement;
+            
+            const editIcon = container.querySelector('.inline-edit-icon');
+            if (editIcon) editIcon.style.display = 'none';
+
+            const currentValue = profileData.full_name || '';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'edit-input';
+            input.value = currentValue;
+            input.placeholder = 'Enter full name';
+
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'd-flex gap-1';
+            actionDiv.innerHTML = `
+                <button class="btn btn-sm btn-success save-btn"><i class="fas fa-check"></i></button>
+                <button class="btn btn-sm btn-danger cancel-btn"><i class="fas fa-times"></i></button>
+            `;
+
+            span.style.display = 'none';
+            container.appendChild(input);
+            container.appendChild(actionDiv);
+            input.focus();
+            input.select();
+
+            // Save
+            actionDiv.querySelector('.save-btn').addEventListener('click', function() {
+                const newVal = input.value.trim();
+                if (newVal === '') {
+                    showToast('Name cannot be empty', 'error');
+                    return;
+                }
+                profileData.full_name = newVal;
+                span.textContent = newVal;
+                span.style.display = 'inline';
+                input.remove();
+                actionDiv.remove();
+                if (editIcon) editIcon.style.display = 'inline-block';
+                isEditing = false;
+                document.getElementById('displayName').textContent = newVal;
+                showToast('Name updated. Click Save to persist.', 'success');
+            });
+
+            // Cancel
+            actionDiv.querySelector('.cancel-btn').addEventListener('click', function() {
+                span.style.display = 'inline';
+                input.remove();
+                actionDiv.remove();
+                if (editIcon) editIcon.style.display = 'inline-block';
+                isEditing = false;
+            });
+
+            // Enter key
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    actionDiv.querySelector('.save-btn').click();
+                } else if (e.key === 'Escape') {
+                    actionDiv.querySelector('.cancel-btn').click();
+                }
+            });
+        }
+
+        // ============================================
+        // EDIT PHONE (when phone exists)
+        // ============================================
+        
+        function editPhone() {
+            // Pre-fill the modal with current phone
+            const currentPhone = profileData.phone_number || '';
+            // Try to extract country code and number
+            let countryCode = '+91';
+            let number = currentPhone;
+            
+            // Simple extraction - if phone starts with +, try to split
+            if (currentPhone.startsWith('+')) {
+                const match = currentPhone.match(/^(\+\d+)(.*)/);
+                if (match) {
+                    countryCode = match[1];
+                    number = match[2].trim();
+                }
+            }
+            
+            document.getElementById('phoneCountryCode').value = countryCode;
+            document.getElementById('phoneNumberInput').value = number;
+            
+            // Change modal title to Edit
+            document.querySelector('#phoneModal .modal-title').innerHTML = 
+                '<i class="fas fa-phone me-2" style="color: #60a5fa;"></i>Edit Phone Number';
+            
+            const modal = new bootstrap.Modal(document.getElementById('phoneModal'));
+            modal.show();
+        }
+
+        // ============================================
+        // OPEN PHONE MODAL (when phone missing)
+        // ============================================
+        
+        function openPhoneModal() {
+            document.getElementById('phoneCountryCode').value = '+91';
+            document.getElementById('phoneNumberInput').value = '';
+            
+            document.querySelector('#phoneModal .modal-title').innerHTML = 
+                '<i class="fas fa-phone me-2" style="color: #60a5fa;"></i>Add Phone Number';
+            
+            const modal = new bootstrap.Modal(document.getElementById('phoneModal'));
+            modal.show();
+        }
+
+        // ============================================
+        // SAVE PHONE NUMBER
+        // ============================================
+        
+        function savePhoneNumber() {
+            const countryCode = document.getElementById('phoneCountryCode').value;
+            const number = document.getElementById('phoneNumberInput').value.trim();
+            
+            if (!number) {
+                showToast('Please enter a phone number', 'error');
+                return;
+            }
+            
+            if (number.length < 10) {
+                showToast('Please enter a valid phone number (min 10 digits)', 'error');
+                return;
+            }
+            
+            const fullPhone = countryCode + ' ' + number;
+            profileData.phone_number = fullPhone;
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('phoneModal'));
+            modal.hide();
+            
+            // Update UI
+            renderProfile();
+            showToast('Phone number updated locally. Click Save to persist.', 'success');
+        }
+
+        // ============================================
+        // SAVE PROFILE
+        // ============================================
+        
+        async function saveProfile() {
+            // Commit any pending edit
+            if (isEditing) {
+                const input = document.querySelector('.edit-input');
+                if (input) {
+                    const newVal = input.value.trim();
+                    if (newVal === '') {
+                        showToast('Name cannot be empty', 'error');
+                        return;
+                    }
+                    profileData.full_name = newVal;
+                    const container = input.parentElement;
+                    const span = container.querySelector('span:not(.edit-input)');
+                    if (span) {
+                        span.textContent = newVal;
+                        span.style.display = 'inline';
+                    }
+                    input.remove();
+                    const actions = container.querySelector('.d-flex');
+                    if (actions) actions.remove();
+                    const editIcon = container.querySelector('.inline-edit-icon');
+                    if (editIcon) editIcon.style.display = 'inline-block';
+                    isEditing = false;
+                }
+            }
+
+            // Check if anything changed
+            if (originalData) {
+                const nameChanged = profileData.full_name !== originalData.full_name;
+                const phoneChanged = profileData.phone_number !== originalData.phone_number;
+                
+                if (!nameChanged && !phoneChanged) {
+                    showToast('No changes to save', 'warning');
+                    return;
+                }
+            }
+
+            try {
+                showToast('Saving...', 'info');
+                
+                const updateData = {
+                    full_name: profileData.full_name,
+                    phone_number: profileData.phone_number
+                };
+                
+                const response = await fetch(PROFILE_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    originalData = { ...profileData };
+                    renderProfile();
+                    showToast(result.message || 'Profile updated successfully', 'success');
+                } else {
+                    showToast(result.message || 'Error saving profile', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Error saving profile', 'error');
+            }
+        }
+
+        // ============================================
+        // RESET PROFILE
+        // ============================================
+        
+        function resetProfile() {
+            if (isEditing) {
+                const input = document.querySelector('.edit-input');
+                if (input) {
+                    const container = input.parentElement;
+                    const span = container.querySelector('span:not(.edit-input)');
+                    if (span) {
+                        span.style.display = 'inline';
+                    }
+                    input.remove();
+                    const actions = container.querySelector('.d-flex');
+                    if (actions) actions.remove();
+                    const editIcon = container.querySelector('.inline-edit-icon');
+                    if (editIcon) editIcon.style.display = 'inline-block';
+                    isEditing = false;
+                }
+            }
+            
+            if (originalData) {
+                profileData = { ...originalData };
+                renderProfile();
+                showToast('Profile reset to last saved state', 'info');
+            } else {
+                loadProfile();
+            }
+        }
+
+        // ============================================
+        // COPY REFERRAL
+        // ============================================
+        
+        function copyReferral() {
+            const code = document.getElementById('profileReferral').textContent;
+            if (code && code !== '--') {
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('Referral code copied!', 'success');
+                }).catch(() => {
+                    const input = document.createElement('input');
+                    input.value = code;
+                    document.body.appendChild(input);
+                    input.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(input);
+                    showToast('Referral code copied!', 'success');
+                });
+            }
+        }
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+        
+        function showToast(message, type = 'info') {
+            document.querySelectorAll('.toast').forEach(t => t.remove());
+            
+            const colors = {
+                success: 'bg-success',
+                error: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-info'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white ${colors[type]} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            let container = document.querySelector('.toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            
+            container.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        
+        loadProfile();
+        console.log('✅ Profile page loaded');
+    </script>
+
+</body>
+</html>

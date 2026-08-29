@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Earn - PaisaPay</title>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .task-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            height: 100%;
+            position: relative;
+        }
+        .task-card:hover:not(.disabled) {
+            transform: translateY(-4px);
+            border-color: rgba(108,60,225,0.3);
+            box-shadow: 0 4px 20px rgba(108,60,225,0.1);
+        }
+        .task-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .task-card .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .task-card .task-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .task-card .task-reward {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+        .task-card .task-timer {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .task-card .completed-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #10b981;
+            color: white;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .task-card .disabled-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #10b981;
+        }
+        .task-card .daily-limit-text {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .filter-btn {
+            background: transparent;
+            border: 1px solid #1e293b;
+            color: #94a3b8;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .filter-btn:hover {
+            border-color: #6C3CE1;
+            color: #fff;
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            border-color: transparent;
+            color: white;
+        }
+        .stats-mini {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 12px 16px;
+            text-align: center;
+            height: 100%;
+        }
+        .stats-mini .number {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stats-mini .label {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .modal-task-details {
+            padding: 10px 0;
+        }
+        .modal-task-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a2234;
+        }
+        .modal-task-details .detail-row:last-child {
+            border-bottom: none;
+        }
+        .timer-progress {
+            height: 4px;
+            background: #1e293b;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .timer-progress .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6C3CE1, #9B59B6);
+            transition: width 0.3s ease;
+            width: 100%;
+        }
+        .task-failed-icon {
+            font-size: 56px;
+            color: #ef4444;
+            margin-bottom: 12px;
+        }
+        .task-success-icon {
+            font-size: 56px;
+            color: #10b981;
+            margin-bottom: 12px;
+        }
+        
+        /* Timer Overlay */
+        .timer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .timer-overlay.show {
+            display: flex;
+        }
+        .timer-overlay .big-timer {
+            font-size: 72px;
+            font-weight: 900;
+            color: #f59e0b;
+            font-family: monospace;
+        }
+        .timer-overlay .timer-label {
+            color: #94a3b8;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+        .timer-overlay .timer-progress-big {
+            width: 200px;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        .timer-overlay .timer-progress-big .bar {
+            height: 100%;
+            background: linear-gradient(90deg, #6C3CE1, #9B59B6);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+        .timer-overlay .warning-text {
+            color: #fca5a5;
+            font-size: 14px;
+            margin-top: 16px;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        /* Result Modal - Larger & Better */
+        .result-modal .modal-content {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 20px;
+            padding: 20px;
+        }
+        .result-modal .modal-body {
+            padding: 30px 20px;
+        }
+        .result-modal .icon-big {
+            font-size: 72px;
+            margin-bottom: 16px;
+        }
+        .result-modal .icon-big.success { color: #10b981; }
+        .result-modal .icon-big.failed { color: #ef4444; }
+        .result-modal h3 {
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .result-modal .message {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+        .result-modal .reward-amount {
+            font-size: 36px;
+            font-weight: 800;
+            color: #fbbf24;
+            margin: 8px 0;
+        }
+        .result-modal .btn-close-modal {
+            background: linear-gradient(135deg, #6C3CE1, #9B59B6);
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+        .result-modal .btn-close-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(108,60,225,0.3);
+        }
+        .result-modal .btn-close-modal.danger {
+            background: #ef4444;
+        }
+        .result-modal .btn-close-modal.danger:hover {
+            background: #dc2626;
+        }
+        .result-modal .detail-box {
+            background: #0d1524;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border: 1px solid #1a2234;
+        }
+        .result-modal .detail-box .label {
+            color: #64748b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .result-modal .detail-box .value {
+            font-weight: 600;
+            font-size: 16px;
+            color: #ffffff;
+        }
+        
+        .bottom-nav {
+            background: #111827 !important;
+            border-top: 1px solid #1e293b;
+            padding: 4px 0 env(safe-area-inset-bottom);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1050;
+        }
+        .bottom-nav .nav-link {
+            color: #64748b !important;
+            text-align: center;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: 500;
+            min-width: 48px;
+            text-decoration: none;
+        }
+        .bottom-nav .nav-link i {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 1px;
+        }
+        .bottom-nav .nav-link.active {
+            color: #8B5CF6 !important;
+        }
+        .bottom-nav .nav-link.active i {
+            color: #8B5CF6 !important;
+        }
+        
+        @media (max-width: 480px) {
+            .task-card .task-title { font-size: 12px; }
+            .task-card .icon { width: 40px; height: 40px; font-size: 16px; }
+            .stats-mini .number { font-size: 16px; }
+            .filter-btn { font-size: 11px; padding: 4px 12px; }
+            .timer-overlay .big-timer { font-size: 48px; }
+            .result-modal .icon-big { font-size: 52px; }
+            .result-modal .reward-amount { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+    ✅ TOP NAVIGATION
+    ============================================ -->
+    
+    <iframe 
+        src="/includes/nav.html" 
+        style="width:100%; height:56px; border:none; position:fixed; top:0; left:0; z-index:1000; background:transparent !important; overflow:visible;"
+        scrolling="no"
+        id="navIframe"
+        allowtransparency="true">
+    </iframe>
+
+    <script>
+        window.addEventListener('message', function(event) {
+            var iframe = document.getElementById('navIframe');
+            if (!iframe) return;
+            
+            if (event.data && event.data.type === 'expandNav') {
+                iframe.style.height = '400px';
+                iframe.style.background = 'transparent';
+            } else if (event.data && event.data.type === 'collapseNav') {
+                iframe.style.height = '56px';
+                iframe.style.background = 'transparent';
+            }
+        });
+    </script>
+
+    <!-- ============================================
+    MAIN CONTENT
+    ============================================ -->
+    
+    <div class="container mt-5 pt-4 pb-5">
+        
+        <!-- Stats -->
+        <div class="row g-2 g-md-3 mb-4">
+            <div class="col-6">
+                <div class="stats-mini">
+                    <div class="number" id="todayEarnings">₹0</div>
+                    <div class="label">Today's Earnings</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="stats-mini">
+                    <div class="number" id="todayTasks">0/10</div>
+                    <div class="label">Tasks Today</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <button class="filter-btn active" data-filter="all" onclick="filterTasks('all')">All</button>
+            <button class="filter-btn" data-filter="website" onclick="filterTasks('website')">Website</button>
+            <button class="filter-btn" data-filter="youtube" onclick="filterTasks('youtube')">YouTube</button>
+            <button class="filter-btn" data-filter="instagram" onclick="filterTasks('instagram')">Instagram</button>
+            <button class="filter-btn" data-filter="whatsapp" onclick="filterTasks('whatsapp')">WhatsApp</button>
+            <button class="filter-btn" data-filter="telegram" onclick="filterTasks('telegram')">Telegram</button>
+        </div>
+
+        <!-- Tasks List -->
+        <h5 class="text-white mb-3"><i class="fas fa-list me-2"></i>Available Tasks</h5>
+        <div id="tasksContainer" class="row g-3">
+            <div class="col-12 text-center text-secondary py-5">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2">Loading tasks...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    TIMER OVERLAY
+    ============================================ -->
+    
+    <div class="timer-overlay" id="timerOverlay">
+        <div class="big-timer" id="bigTimerDisplay">30</div>
+        <div class="timer-label">⏳ Task in progress...</div>
+        <div class="timer-progress-big">
+            <div class="bar" id="bigTimerProgress" style="width: 100%"></div>
+        </div>
+        <div class="warning-text">
+            ⚠️ <strong>Please stay on the task page!</strong><br>
+            If you come back before the timer ends, the task will fail.
+        </div>
+    </div>
+
+    <!-- ============================================
+    MODALS
+    ============================================ -->
+    
+    <!-- Task Modal -->
+    <div class="modal fade" id="taskModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskModalTitle">Complete Task</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="taskModalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    RESULT MODAL - UPDATED (No Toasts)
+    ============================================ -->
+    
+    <div class="modal fade result-modal" id="resultModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center" id="resultModalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+    BOTTOM NAVIGATION
+    ============================================ -->
+    
+    <nav class="bottom-nav">
+        <div class="container d-flex justify-content-around">
+            <a href="dashboard.html" class="nav-link" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="earn.html" class="nav-link active" data-page="earn">
+                <i class="fas fa-tasks"></i>
+                <span>Earn</span>
+            </a>
+            <a href="leaderboard.html" class="nav-link" data-page="leaderboard">
+                <i class="fas fa-trophy"></i>
+                <span>Rank</span>
+            </a>
+            <a href="invite.html" class="nav-link" data-page="invite">
+                <i class="fas fa-user-plus"></i>
+                <span>Invite</span>
+            </a>
+            <a href="withdraw.html" class="nav-link" data-page="withdraw">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Withdraw</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Toast Container (Only for non-task messages) -->
+    <div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // ============================================
+        // ✅ AUTH CHECK
+        // ============================================
+        
+        const token = localStorage.getItem('auth_token');
+        const userData = localStorage.getItem('user_data');
+        
+        if (!token || !userData) {
+            window.location.replace('/login.html');
+        }
+        
+        console.log('✅ User authenticated, loading earn page');
+        
+        // ============================================
+        // ✅ STATE
+        // ============================================
+        
+        let allTasks = [];
+        let currentFilter = 'all';
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let isTaskInProgress = false;
+        let currentTaskId = null;
+        let isTaskCompleted = false;
+        let dailyLimit = 10;
+        const processingTasks = new Set();
+        let resultModal = null;
+        
+        // ============================================
+        // ✅ DOM REFS
+        // ============================================
+        
+        const timerOverlay = document.getElementById('timerOverlay');
+        const bigTimerDisplay = document.getElementById('bigTimerDisplay');
+        const bigTimerProgress = document.getElementById('bigTimerProgress');
+        
+        // ============================================
+        // ✅ PAGE VISIBILITY API
+        // ============================================
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                console.log('⚠️ User left the page');
+            } else {
+                if (isTaskInProgress && !isTaskCompleted) {
+                    console.log('⚠️ User returned early - task will fail');
+                    clearInterval(timerInterval);
+                    isTaskInProgress = false;
+                    timerOverlay.classList.remove('show');
+                    showResultModal(false, 'Task Failed', '❌ You returned to PaisaPay before the timer ended! Stay on the task page until the timer finishes.');
+                }
+            }
+        });
+        
+        // ============================================
+        // ✅ BEFORE UNLOAD
+        // ============================================
+        
+        window.addEventListener('beforeunload', function(e) {
+            if (isTaskInProgress && !isTaskCompleted) {
+                sessionStorage.setItem('task_interrupted', 'true');
+                sessionStorage.setItem('interrupted_task_id', currentTaskId);
+                sessionStorage.setItem('interrupted_time', Date.now());
+            }
+        });
+        
+        // Check interrupted task
+        (function checkInterruptedTask() {
+            if (sessionStorage.getItem('task_interrupted') === 'true') {
+                const taskId = sessionStorage.getItem('interrupted_task_id');
+                console.log('⚠️ Task was interrupted:', taskId);
+                sessionStorage.removeItem('task_interrupted');
+                sessionStorage.removeItem('interrupted_task_id');
+                sessionStorage.removeItem('interrupted_time');
+                setTimeout(() => {
+                    showResultModal(false, 'Task Failed!', '❌ You left the page during the task. Please try again.');
+                }, 500);
+            }
+        })();
+        
+        // ============================================
+        // ✅ LOAD DATA
+        // ============================================
+        
+        async function loadTasks() {
+            try {
+                const response = await fetch('https://paisa-pay.online/api/tasks/list.php', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                if (response.status === 401) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    window.location.replace('/login.html');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    allTasks = data.data || [];
+                    
+                    if (data.today_stats) {
+                        const todayTasks = document.getElementById('todayTasks');
+                        if (todayTasks) {
+                            const completed = data.today_stats.tasks_completed || 0;
+                            todayTasks.textContent = completed + '/' + dailyLimit;
+                        }
+                        
+                        const todayEarnings = document.getElementById('todayEarnings');
+                        if (todayEarnings) {
+                            todayEarnings.textContent = '₹' + Math.round(data.today_stats.earnings || 0);
+                        }
+                    }
+                    
+                    renderTasks(allTasks);
+                } else {
+                    showToast(data.message || 'Error loading tasks', 'error');
+                }
+            } catch (error) {
+                console.error('Load tasks error:', error);
+                showToast('Error loading tasks', 'error');
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                const response = await fetch('https://paisa-pay.online/api/user/dashboard.php', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const d = data.data;
+                    const wallet = d.user?.wallet_balance || 0;
+                    document.getElementById('walletBalance').textContent = '₹' + Math.round(wallet);
+                    
+                    const todayEarnings = d.stats?.tasks?.today_earnings || 0;
+                    document.getElementById('todayEarnings').textContent = '₹' + Math.round(todayEarnings);
+                    
+                    const todayTasks = d.stats?.tasks?.today || 0;
+                    document.getElementById('todayTasks').textContent = todayTasks + '/' + dailyLimit;
+                }
+            } catch (error) {
+                console.error('Load stats error:', error);
+            }
+        }
+        
+        // ============================================
+        // ✅ RENDER TASKS
+        // ============================================
+        
+        function renderTasks(tasks) {
+            const container = document.getElementById('tasksContainer');
+            
+            const filteredTasks = currentFilter === 'all' 
+                ? tasks 
+                : tasks.filter(t => t.task_type === currentFilter);
+            
+            if (!filteredTasks || filteredTasks.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="card bg-dark text-white text-center py-5 border-secondary">
+                            <i class="fas fa-inbox fa-3x text-secondary mb-3"></i>
+                            <p class="text-secondary">No tasks available</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredTasks.map(task => {
+                const limit = task.daily_limit || 1;
+                const completedToday = task.completed_today || 0;
+                const remaining = Math.max(0, limit - completedToday);
+                const isCompleted = remaining <= 0;
+                const disabledClass = isCompleted ? 'disabled' : '';
+                
+                let progressText = `${completedToday}/${limit} today`;
+                if (isCompleted) {
+                    progressText = `✅ ${completedToday}/${limit} - Done!`;
+                } else if (remaining === 1) {
+                    progressText = `${completedToday}/${limit} - ${remaining} left!`;
+                } else {
+                    progressText = `${completedToday}/${limit} - ${remaining} left`;
+                }
+                
+                return `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="task-card ${disabledClass}" data-task-id="${task.id}" onclick="${isCompleted ? '' : `openTask(${task.id})`}">
+                            ${isCompleted ? '<div class="disabled-overlay"><i class="fas fa-check-circle me-2"></i>Done</div>' : ''}
+                            ${isCompleted ? '<span class="completed-badge">✅ Done</span>' : ''}
+                            <div class="icon bg-primary-gradient">
+                                <i class="fas ${task.icon || 'fa-link'}"></i>
+                            </div>
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-reward">₹${task.reward_amount}</div>
+                            <div class="task-timer"><i class="far fa-clock me-1"></i>${task.timer_seconds || 30}s</div>
+                            <small class="text-secondary">${task.task_type}</small>
+                            <div class="daily-limit-text">${progressText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ============================================
+        // ✅ FILTER TASKS
+        // ============================================
+        
+        window.filterTasks = function(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            renderTasks(allTasks);
+        };
+        
+        // ============================================
+        // ✅ OPEN TASK
+        // ============================================
+        
+        window.openTask = function(taskId) {
+            if (isTaskInProgress) {
+                showToast('⏳ Please wait for current task to complete', 'warning');
+                return;
+            }
+            
+            const task = allTasks.find(t => t.id === taskId);
+            if (!task) {
+                showToast('Task not found', 'error');
+                return;
+            }
+            
+            const limit = task.daily_limit || 1;
+            const completedToday = task.completed_today || 0;
+            const remaining = Math.max(0, limit - completedToday);
+            
+            if (remaining <= 0) {
+                showToast(`✅ Task already completed ${limit}/${limit} times today!`, 'warning');
+                return;
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+            const body = document.getElementById('taskModalBody');
+            
+            body.innerHTML = `
+                <div class="text-center mb-4">
+                    <div class="icon bg-primary-gradient mx-auto mb-3" style="width: 56px; height: 56px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
+                        <i class="fas ${task.icon || 'fa-link'}"></i>
+                    </div>
+                    <h5>${task.title}</h5>
+                    <p class="text-secondary small">${task.description || 'Complete this task to earn rewards'}</p>
+                    <div class="alert alert-warning small mt-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>⚠️ Important!</strong> You will be redirected to the task page. 
+                        <strong>Stay there until the timer completes.</strong> 
+                        If you come back early, the task will fail!
+                    </div>
+                </div>
+                
+                <div class="modal-task-details">
+                    <div class="detail-row">
+                        <span class="text-secondary">Reward</span>
+                        <span class="text-warning fw-bold">₹${task.reward_amount}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="text-secondary">Time Required</span>
+                        <span>${task.timer_seconds || 30}s</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="text-secondary">Type</span>
+                        <span>${task.task_type}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="text-secondary">Today's Progress</span>
+                        <span>${completedToday}/${limit} (${remaining} left)</span>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-primary w-100" onclick="startTask(${task.id})" id="startTaskBtn">
+                        <i class="fas fa-external-link-alt me-2"></i>Go to Task Page
+                    </button>
+                </div>
+            `;
+            
+            modal.show();
+        };
+        
+        // ============================================
+        // ✅ START TASK
+        // ============================================
+        
+        window.startTask = function(taskId) {
+            if (isTaskInProgress) return;
+            
+            const task = allTasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const limit = task.daily_limit || 1;
+            const completedToday = task.completed_today || 0;
+            
+            if (completedToday >= limit) {
+                showToast('✅ Task already completed today', 'warning');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+                if (modal) modal.hide();
+                return;
+            }
+            
+            // Close task modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+            if (modal) modal.hide();
+            
+            // Set task state
+            isTaskInProgress = true;
+            isTaskCompleted = false;
+            currentTaskId = taskId;
+            const taskDuration = task.timer_seconds || 30;
+            
+            // Show timer overlay
+            timerOverlay.classList.add('show');
+            bigTimerDisplay.textContent = taskDuration;
+            bigTimerProgress.style.width = '100%';
+            
+            // Open URL in new tab
+            if (task.url) {
+                window.open(task.url, '_blank');
+            }
+            
+            // Start timer
+            let remaining = taskDuration;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                remaining--;
+                bigTimerDisplay.textContent = remaining;
+                bigTimerProgress.style.width = `${(remaining / taskDuration) * 100}%`;
+                
+                if (!document.hidden) {
+                    clearInterval(timerInterval);
+                    isTaskInProgress = false;
+                    timerOverlay.classList.remove('show');
+                    showResultModal(false, 'Task Failed', '❌ You came back to PaisaPay before the timer ended! Stay on the task page until the timer finishes.');
+                    return;
+                }
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    isTaskCompleted = true;
+                    timerOverlay.classList.remove('show');
+                    claimTask(taskId);
+                }
+            }, 1000);
+        };
+        
+        // ============================================
+        // ✅ SHOW RESULT MODAL - NO TOASTS
+        // ============================================
+        
+        function showResultModal(success, title, message, reward = 0) {
+            // Close any existing result modal
+            if (resultModal) {
+                resultModal.hide();
+            }
+            
+            const modalElement = document.getElementById('resultModal');
+            const body = document.getElementById('resultModalBody');
+            
+            const icon = success ? 'fa-check-circle' : 'fa-times-circle';
+            const iconClass = success ? 'success' : 'failed';
+            const btnClass = success ? '' : 'danger';
+            const btnText = success ? 'Continue' : 'Try Again';
+            const titleColor = success ? '#10b981' : '#ef4444';
+            
+            let rewardHtml = '';
+            if (success && reward > 0) {
+                rewardHtml = `
+                    <div class="detail-box">
+                        <div class="label">💰 You Earned</div>
+                        <div class="reward-amount">₹${reward}</div>
+                    </div>
+                `;
+            }
+            
+            body.innerHTML = `
+                <div class="icon-big ${iconClass}">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <h3 style="color: ${titleColor};">${title}</h3>
+                <div class="message">${message}</div>
+                ${rewardHtml}
+                <button class="btn-close-modal ${btnClass}" onclick="closeResultModal()">
+                    ${btnText}
+                </button>
+            `;
+            
+            // Show modal
+            resultModal = new bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            resultModal.show();
+        }
+        
+        function closeResultModal() {
+            if (resultModal) {
+                resultModal.hide();
+                resultModal = null;
+            }
+            // Refresh data after closing
+            loadTasks();
+            loadStats();
+            resetTaskStates();
+        }
+        
+        // ============================================
+        // ✅ TASK CLAIM - UPDATED
+        // ============================================
+        
+        async function claimTask(taskId) {
+            // Check if task is already being processed
+            if (processingTasks.has(taskId)) {
+                return;
+            }
+            
+            // Mark task as processing
+            processingTasks.add(taskId);
+            
+            // ✅ IMMEDIATELY UPDATE UI - Optimistic update
+            const task = allTasks.find(t => t.id === taskId);
+            let rewardAmount = 0;
+            if (task) {
+                rewardAmount = task.reward_amount;
+                task.completed_today = (task.completed_today || 0) + 1;
+                renderTasks(allTasks);
+                
+                // Update stats instantly
+                const todayTasks = document.getElementById('todayTasks');
+                const current = parseInt(todayTasks.textContent.split('/')[0]) || 0;
+                todayTasks.textContent = (current + 1) + '/' + dailyLimit;
+            }
+            
+            try {
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    showResultModal(false, 'Login Required', '❌ Please login first to claim rewards.');
+                    return;
+                }
+                
+                const response = await fetch('/api/tasks/claim.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ task_id: taskId })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+                
+                const data = await response.json();
+                console.log('Task claim response:', data);
+                
+                if (data.success) {
+                    // Update balance
+                    if (data.new_balance !== undefined) {
+                        updateNavBalance(data.new_balance);
+                        // Update today's earnings
+                        const todayEarnings = document.getElementById('todayEarnings');
+                        const currentEarnings = parseInt(todayEarnings.textContent.replace('₹', '')) || 0;
+                        todayEarnings.textContent = '₹' + (currentEarnings + data.reward);
+                    }
+                    
+                    // ✅ SHOW SUCCESS MODAL (NO TOAST)
+                    showResultModal(
+                        true, 
+                        '🎉 Task Completed!', 
+                        'Great job! You earned the reward.',
+                        data.reward || rewardAmount
+                    );
+                    
+                    // Refresh tasks from server
+                    await loadTasks();
+                    await loadStats();
+                    
+                } else {
+                    // ❌ If failed, revert the optimistic update
+                    if (task) {
+                        task.completed_today = (task.completed_today || 0) - 1;
+                        renderTasks(allTasks);
+                    }
+                    // ✅ SHOW ERROR MODAL (NO TOAST)
+                    showResultModal(false, 'Task Failed', '❌ ' + (data.message || 'Failed to claim task'));
+                }
+                
+            } catch (error) {
+                console.error('Claim error:', error);
+                
+                // Revert optimistic update on error
+                if (task) {
+                    task.completed_today = (task.completed_today || 0) - 1;
+                    renderTasks(allTasks);
+                }
+                showResultModal(false, 'Error', '❌ ' + error.message);
+                
+            } finally {
+                // Always remove from processing set
+                processingTasks.delete(taskId);
+                isTaskInProgress = false;
+                isTaskCompleted = false;
+                currentTaskId = null;
+            }
+        }
+        
+        // ============================================
+        // ✅ UPDATE NAV BALANCE
+        // ============================================
+        
+        function updateNavBalance(amount) {
+            document.querySelectorAll('#walletBalance, .wallet-balance, .balance-display').forEach(el => {
+                el.textContent = '₹' + Math.round(amount);
+            });
+            
+            const iframe = document.getElementById('navIframe');
+            if (iframe && iframe.contentWindow) {
+                try {
+                    iframe.contentWindow.postMessage({
+                        type: 'updateBalance',
+                        balance: amount
+                    }, '*');
+                } catch(e) {
+                    console.log('Cannot send to iframe:', e);
+                }
+            }
+            
+            localStorage.setItem('user_balance', amount);
+            
+            if (typeof ppUpdateBalance === 'function') {
+                ppUpdateBalance(amount);
+            }
+        }
+        
+        // ============================================
+        // ✅ RESET TASK STATE
+        // ============================================
+        
+        function resetTaskStates() {
+            processingTasks.clear();
+            isTaskInProgress = false;
+            isTaskCompleted = false;
+            currentTaskId = null;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            timerOverlay.classList.remove('show');
+        }
+        
+        // ============================================
+        // ✅ TOAST FUNCTION (Only for non-task messages)
+        // ============================================
+        
+        function showToast(message, type = 'info') {
+            const container = document.querySelector('.toast-container');
+            if (!container) {
+                const newContainer = document.createElement('div');
+                newContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                document.body.appendChild(newContainer);
+            }
+            
+            const colors = {
+                success: 'bg-success',
+                error: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-info'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white ${colors[type]} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            const container2 = document.querySelector('.toast-container');
+            container2.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+        }
+        
+        // ============================================
+        // ✅ LOAD ON PAGE LOAD
+        // ============================================
+        
+        resetTaskStates();
+        loadTasks();
+        loadStats();
+        
+        setInterval(() => {
+            if (!isTaskInProgress && !processingTasks.size) {
+                loadTasks();
+                loadStats();
+            }
+        }, 30000);
+        
+        console.log('✅ Earn page loaded successfully');
+    </script>
+
+</body>
+</html>
