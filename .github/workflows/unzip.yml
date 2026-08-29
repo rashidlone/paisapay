@@ -16,34 +16,50 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Unzip public_html.zip
+      - name: Prepare files
         run: |
+          rm -rf /tmp/paisapay_source
+          mkdir -p /tmp/paisapay_source
+
+          # Copy existing repository files
+          rsync -a ./ /tmp/paisapay_source/ \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='vendor' \
+            --exclude='node_modules' \
+            --exclude='CODE.md' \
+            --exclude='public_html'
+
+          # Extract ZIP into temporary location
           if [ -f "public_html.zip" ]; then
-            rm -rf public_html
-            mkdir -p public_html
-            unzip -o public_html.zip -d public_html
+            echo "Extracting public_html.zip..."
+            mkdir -p /tmp/paisapay_source/public_html
+            unzip -o "public_html.zip" \
+              -d /tmp/paisapay_source/public_html
           fi
 
-      - name: Delete old CODE.md
+      - name: Generate CODE.md
         run: |
           rm -f CODE.md
 
-      - name: Generate new CODE.md
-        run: |
-          echo "# Repository Source Code" > CODE.md
-          echo "" >> CODE.md
+          cat > CODE.md <<'EOF'
+          # Repository Source Code
 
-          find . -type f \
-            ! -path "./.git/*" \
-            ! -path "./.github/*" \
-            ! -path "./vendor/*" \
-            ! -path "./node_modules/*" \
-            ! -path "./CODE.md" \
-            ! -path "./public_html.zip" \
+          Complete source code of the Paisapay project.
+
+          ---
+
+          EOF
+
+          find /tmp/paisapay_source -type f \
+            ! -path '*/vendor/*' \
+            ! -path '*/node_modules/*' \
+            ! -path '*/.git/*' \
             | sort | while read -r file
           do
-            echo "Processing: $file"
 
             # Skip binary files
             if ! grep -Iq . "$file" 2>/dev/null; then
@@ -51,26 +67,64 @@ jobs:
               continue
             fi
 
-            path="${file#./}"
+            # Convert temporary path to repository path
+            path="${file#/tmp/paisapay_source/}"
 
             case "$file" in
-              *.php) lang="php" ;;
-              *.html|*.htm) lang="html" ;;
-              *.css) lang="css" ;;
-              *.js) lang="javascript" ;;
-              *.json) lang="json" ;;
-              *.sql) lang="sql" ;;
-              *.xml) lang="xml" ;;
-              *.svg) lang="xml" ;;
-              *.yml|*.yaml) lang="yaml" ;;
-              *.env) lang="dotenv" ;;
-              *.htaccess) lang="apache" ;;
-              *.sh) lang="bash" ;;
-              *.py) lang="python" ;;
-              *.md) lang="markdown" ;;
-              *.txt) lang="text" ;;
-              *) lang="text" ;;
+              *.php)
+                lang="php"
+                ;;
+              *.html|*.htm)
+                lang="html"
+                ;;
+              *.css)
+                lang="css"
+                ;;
+              *.js)
+                lang="javascript"
+                ;;
+              *.json)
+                lang="json"
+                ;;
+              *.sql)
+                lang="sql"
+                ;;
+              *.xml)
+                lang="xml"
+                ;;
+              *.svg)
+                lang="xml"
+                ;;
+              *.yml|*.yaml)
+                lang="yaml"
+                ;;
+              *.env)
+                lang="dotenv"
+                ;;
+              */.env)
+                lang="dotenv"
+                ;;
+              *.htaccess)
+                lang="apache"
+                ;;
+              *.sh)
+                lang="bash"
+                ;;
+              *.py)
+                lang="python"
+                ;;
+              *.md)
+                lang="markdown"
+                ;;
+              *.txt)
+                lang="text"
+                ;;
+              *)
+                lang="text"
+                ;;
             esac
+
+            echo "Adding: $path"
 
             {
               echo "## \`$path\`"
@@ -86,13 +140,29 @@ jobs:
 
           done
 
+          echo "CODE.md generated."
+          wc -l CODE.md
+          du -h CODE.md
+
       - name: Commit and push CODE.md
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add -A
+          # Get latest remote changes
+          git fetch origin main
 
-          git commit -m "Regenerate CODE.md" || echo "No changes to commit"
+          # Make sure our branch is based on latest main
+          git rebase origin/main
 
-          git push
+          # Only commit CODE.md
+          git add CODE.md
+
+          if git diff --cached --quiet; then
+            echo "CODE.md is already up to date."
+            exit 0
+          fi
+
+          git commit -m "Update CODE.md"
+
+          git push origin HEAD:main
