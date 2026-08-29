@@ -1,11 +1,3 @@
-
-### GitHub Actions workflow
-
-Create:
-
-`.github/workflows/generate-code-md.yml`
-
-```yaml
 name: Generate Code Markdown
 
 on:
@@ -25,56 +17,68 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Generate CODE.md
-        shell: bash
+      - name: Unzip public_html.zip
         run: |
-          set -e
+          if [ -f "public_html.zip" ]; then
+            rm -rf public_html
+            mkdir -p public_html
+            unzip -o public_html.zip -d public_html
+          fi
 
-          OUTPUT="CODE.md"
-
-          echo "# Repository Code" > "$OUTPUT"
-          echo "" >> "$OUTPUT"
-          echo "Generated automatically by GitHub Actions." >> "$OUTPUT"
-          echo "" >> "$OUTPUT"
+      - name: Generate CODE.md
+        run: |
+          echo "# Repository Source Code" > CODE.md
+          echo "" >> CODE.md
 
           find . -type f \
             ! -path "./.git/*" \
             ! -path "./.github/*" \
             ! -path "./CODE.md" \
-            | sort | while read -r file; do
+            ! -path "./public_html.zip" \
+            ! -path "./node_modules/*" \
+            ! -path "./vendor/*" \
+            | sort | while read -r file
+          do
+            echo "Processing: $file"
 
-              path="${file#./}"
+            # Skip binary files
+            if ! grep -Iq . "$file" 2>/dev/null; then
+              echo "Skipping binary: $file"
+              continue
+            fi
 
-              echo "## \`$path\`" >> "$OUTPUT"
-              echo "" >> "$OUTPUT"
+            path="${file#./}"
 
-              # Detect language from file extension
-              case "$file" in
-                *.php)      lang="php" ;;
-                *.html|*.htm) lang="html" ;;
-                *.css)      lang="css" ;;
-                *.js)       lang="javascript" ;;
-                *.ts)       lang="typescript" ;;
-                *.json)     lang="json" ;;
-                *.xml)      lang="xml" ;;
-                *.sql)      lang="sql" ;;
-                *.py)       lang="python" ;;
-                *.java)     lang="java" ;;
-                *.c)        lang="c" ;;
-                *.cpp|*.cc) lang="cpp" ;;
-                *.h|*.hpp)  lang="cpp" ;;
-                *.sh)       lang="bash" ;;
-                *.yml|*.yaml) lang="yaml" ;;
-                *.md)       lang="markdown" ;;
-                *.txt)      lang="text" ;;
-                *)          lang="" ;;
-              esac
+            case "$file" in
+              *.php) lang="php" ;;
+              *.html|*.htm) lang="html" ;;
+              *.css) lang="css" ;;
+              *.js) lang="javascript" ;;
+              *.json) lang="json" ;;
+              *.sql) lang="sql" ;;
+              *.xml) lang="xml" ;;
+              *.svg) lang="xml" ;;
+              *.yml|*.yaml) lang="yaml" ;;
+              *.env) lang="dotenv" ;;
+              *.htaccess) lang="apache" ;;
+              *.sh) lang="bash" ;;
+              *.py) lang="python" ;;
+              *.md) lang="markdown" ;;
+              *.txt) lang="text" ;;
+              *) lang="text" ;;
+            esac
 
-              echo '```'"$lang" >> "$OUTPUT"
-              cat "$file" >> "$OUTPUT"
-              echo "" >> "$OUTPUT"
-              echo '```' >> "$OUTPUT"
-              echo "" >> "$OUTPUT"
+            {
+              echo "## \`$path\`"
+              echo ""
+              echo '```'"$lang"
+              cat "$file"
+              echo ""
+              echo '```'
+              echo ""
+              echo "---"
+              echo ""
+            } >> CODE.md
 
           done
 
@@ -86,8 +90,8 @@ jobs:
           git add CODE.md
 
           if git diff --cached --quiet; then
-            echo "No changes to CODE.md"
+            echo "No changes"
           else
-            git commit -m "Update CODE.md"
+            git commit -m "Generate complete source code documentation"
             git push
           fi
