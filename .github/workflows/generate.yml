@@ -19,47 +19,58 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare files
+      - name: Delete old public_html and CODE.md
         run: |
-          rm -rf /tmp/paisapay_source
-          mkdir -p /tmp/paisapay_source
+          echo "Deleting old public_html folder..."
+          rm -rf public_html
 
-          # Copy existing repository files
-          rsync -a ./ /tmp/paisapay_source/ \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='vendor' \
-            --exclude='node_modules' \
-            --exclude='CODE.md' \
-            --exclude='public_html'
-
-          # Extract ZIP into temporary location
-          if [ -f "public_html.zip" ]; then
-            echo "Extracting public_html.zip..."
-            mkdir -p /tmp/paisapay_source/public_html
-            unzip -o "public_html.zip" \
-              -d /tmp/paisapay_source/public_html
-          fi
-
-      - name: Generate CODE.md
-        run: |
+          echo "Deleting old CODE.md..."
           rm -f CODE.md
 
-          cat > CODE.md <<'EOF'
-          # Repository Source Code
+      - name: Extract public_html.zip
+        run: |
+          if [ ! -f "public_html.zip" ]; then
+            echo "ERROR: public_html.zip not found!"
+            exit 1
+          fi
 
-          Complete source code of the Paisapay project.
+          echo "Extracting public_html.zip..."
+
+          mkdir -p public_html
+
+          unzip -o public_html.zip -d public_html
+
+          echo "Extraction completed."
+
+      - name: Generate CODE.md
+        shell: bash
+        run: |
+          echo "Generating CODE.md..."
+
+          cat > CODE.md <<'EOF'
+          # Paisapay Source Code
+
+          This file contains the source code of the project.
+
+          Vendor dependencies, node_modules, binary files, and ZIP files are excluded.
 
           ---
 
           EOF
 
-          find /tmp/paisapay_source -type f \
-            ! -path '*/vendor/*' \
-            ! -path '*/node_modules/*' \
-            ! -path '*/.git/*' \
+          find . -type f \
+            ! -path "./.git/*" \
+            ! -path "./.github/*" \
+            ! -path "./vendor/*" \
+            ! -path "*/vendor/*" \
+            ! -path "./node_modules/*" \
+            ! -path "*/node_modules/*" \
+            ! -path "./CODE.md" \
+            ! -path "./public_html.zip" \
             | sort | while read -r file
           do
+
+            echo "Processing: $file"
 
             # Skip binary files
             if ! grep -Iq . "$file" 2>/dev/null; then
@@ -67,8 +78,7 @@ jobs:
               continue
             fi
 
-            # Convert temporary path to repository path
-            path="${file#/tmp/paisapay_source/}"
+            path="${file#./}"
 
             case "$file" in
               *.php)
@@ -124,8 +134,6 @@ jobs:
                 ;;
             esac
 
-            echo "Adding: $path"
-
             {
               echo "## \`$path\`"
               echo ""
@@ -140,29 +148,35 @@ jobs:
 
           done
 
-          echo "CODE.md generated."
+          echo ""
+          echo "================================"
+          echo "CODE.md generated successfully"
+          echo "================================"
+          echo ""
+
           wc -l CODE.md
           du -h CODE.md
 
-      - name: Commit and push CODE.md
+      - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Get latest remote changes
+          echo "Getting latest changes from GitHub..."
           git fetch origin main
 
-          # Make sure our branch is based on latest main
+          echo "Rebasing on latest main..."
           git rebase origin/main
 
-          # Only commit CODE.md
-          git add CODE.md
+          echo "Adding public_html and CODE.md..."
+          git add public_html CODE.md
 
           if git diff --cached --quiet; then
-            echo "CODE.md is already up to date."
+            echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "Update CODE.md"
+          git commit -m "Extract public_html and regenerate CODE.md"
 
+          echo "Pushing changes..."
           git push origin HEAD:main
